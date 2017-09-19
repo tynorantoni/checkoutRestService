@@ -39,7 +39,7 @@ public class ServoControll {
 
 	// -------------------Add Item to
 	// basket---------------------------------------------
-	@RequestMapping(value = "/basket/add/name/{name}/{qty}", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket", method = RequestMethod.GET)
 	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable String name, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
 		itemService.addToBasket(name, qty);
@@ -60,7 +60,7 @@ public class ServoControll {
 	// -------------------Remove Item from
 	// basket------------------------------------------
 
-	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable String name) {
 		List<Item> items = itemService.showBasket();
 		itemService.removeFromBasket(name);
@@ -68,7 +68,7 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/basket/remove/id/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket/remove/id/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable int id) {
 		List<Item> items = itemService.showBasket();
 		itemService.removeFromBasket(id);
@@ -80,7 +80,7 @@ public class ServoControll {
 	// -------------------Change Quantity Item from
 	// basket------------------------------------------
 
-	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
 	public ResponseEntity<List<Item>> removeQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
 		for (Item item : items) {
@@ -92,7 +92,7 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/basket/change/id/{id}/{qty}", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket/change/id/{id}/{qty}", method = RequestMethod.PUT)
 	public ResponseEntity<List<Item>> removeQtyItemFromBasket(@PathVariable int id, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
 		for (Item item : items) {
@@ -107,7 +107,7 @@ public class ServoControll {
 	// -------------------Remove all Items from
 	// basket------------------------------------------
 
-	@RequestMapping(value = "/basket/remove/all", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket/remove/all", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeItemFromBasket() {
 		List<Item> items = itemService.showBasket();
 		itemService.removeAllFromBasket();
@@ -143,11 +143,11 @@ public class ServoControll {
  * TODO:
  * 1)add the same object? => change qty 
  * 2) Posprzątanie projektu
- * 3) put post get delete
+ * 3) post?
  * 4) Testy Unit
  * 5) testy Integration
  * 6)UATy
  * 
- * 8) wrzucenie buildera do itema
+ * 8) wrzucenie buildera do itema=> prawie że!
  */
 }
