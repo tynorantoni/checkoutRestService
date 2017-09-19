@@ -149,9 +149,13 @@ public class ItemServiceImplementation implements ItemService {
 		return total;
 	}
 
+
+	
 	public void removeAllFromBasket() {
 		basket.clear();
 		
 	}
+
+
 
 }
