@@ -3,7 +3,8 @@ package pl.pawelSz.Spring.Rest.RestService.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.spi.LocationAwareLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 @Transactional
 public class ItemServiceImplementation implements ItemService {
 
+	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
 	private static List<Item> items;
 	private static List<Item> basket = new ArrayList<>();
 	static {
@@ -23,10 +25,11 @@ public class ItemServiceImplementation implements ItemService {
 
 	private static List<Item> itemList() {
 		List<Item> items = new ArrayList<>();
-		items.add(new Item.Builder().name("A").);
-		items.add(new Item(2, "B", 10, 15, 2, 0, 0));
-		items.add(new Item(3, "C", 30, 60, 4, 0, 0));
-		items.add(new Item(4, "D", 25, 40, 2, 0, 0));
+		items.add(new Item.Builder().name("A").id(1).price(40).qtyToDiscount(3).specialPrice(70).build());
+		items.add(new Item.Builder().name("B").id(2).price(10).qtyToDiscount(2).specialPrice(15).build());
+		items.add(new Item.Builder().name("C").id(3).price(30).qtyToDiscount(4).specialPrice(60).build());
+		items.add(new Item.Builder().name("D").id(4).price(25).qtyToDiscount(2).specialPrice(40).build());
+
 		return items;
 	}
 
@@ -35,68 +38,86 @@ public class ItemServiceImplementation implements ItemService {
 	}
 
 	public List<Item> addToBasket(String name, int qty) {
-		if(!basket.isEmpty()){
-		for (Item item : basket) {
-			if(item.getName().equals(name)){
-				System.out.println("raz");
-				this.modifyOrder(name, qty);
+
+		if (basket.isEmpty()) {
+			logger.info("add to empty list");
+			basket.add(findItem(name));
+			basket.get(basket.size() - 1).setQuantity(qty);
+
+		} else {
+			for (int i = 0; i < basket.size(); i++) {
+
+				if (basket.get(i).getName().equals(name)) {
+					logger.info("modify");
+					modifyOrder(name, qty + basket.get(i).getQuantity());
+					return basket;
+				}
 			}
+			logger.info("adding ");
+			basket.add(findItem(name));
+			basket.get(basket.size() - 1).setQuantity(qty);
 		}
-		}else{
-				System.out.println("dwa");
-				basket.add(findItem(name));
-				basket.get(basket.size() - 1).setQuantity(qty);
-			}
 		return basket;
+
 	}
 
 	public List<Item> addToBasket(int id, int qty) {
-		if(!basket.isEmpty()){
-			for (Item item : basket) {
-				if(item.getId()==id){
-					System.out.println("raz");
-					this.modifyOrder(id, qty);
+		if (basket.isEmpty()) {
+			logger.info("add to empty list");
+			basket.add(findItem(id));
+			basket.get(basket.size() - 1).setQuantity(qty);
+
+		} else {
+			for (int i = 0; i < basket.size(); i++) {
+
+				if (basket.get(i).getId() == id) {
+					logger.info("modify");
+					modifyOrder(id, qty + basket.get(i).getQuantity());
+					return basket;
 				}
 			}
-			}else{
-					System.out.println("dwa");
-					basket.add(findItem(id));
-					basket.get(basket.size() - 1).setQuantity(qty);
-				}
-			return basket;
+			logger.info("adding object ");
+			basket.add(findItem(id));
+			basket.get(basket.size() - 1).setQuantity(qty);
+		}
+		return basket;
+
 	}
 
 	public List<Item> removeFromBasket(String name) {
-		if (!basket.contains(name)) {
+		if (basket.isEmpty()) {
 
 			return basket;
 		} else {
-			for (Item item : basket) {
+			for (int i = 0; i < basket.size(); i++) {
 
-				if (item.getName().equals(name)) {
-					basket.remove(item);
+				if (basket.get(i).getName().equals(name)) {
+					logger.info("delete");
+					basket.remove(i);
+					return basket;
 				}
 			}
+
 		}
 		return basket;
-
 	}
 
 	public List<Item> removeFromBasket(int id) {
-		if (!basket.contains(id)) {
+		if (basket.isEmpty()) {
 
 			return basket;
 		} else {
-			for (Item item : basket) {
+			for (int i = 0; i < basket.size(); i++) {
 
-				if (item.getId() == id) {
-					basket.remove(item);
+				if (basket.get(i).getId() == id) {
+					logger.info("delete");
+					basket.remove(i);
+					return basket;
 				}
 			}
+
 		}
-
 		return basket;
-
 	}
 
 	public List<Item> modifyOrder(String name, int qty) {

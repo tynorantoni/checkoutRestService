@@ -1,11 +1,11 @@
 package pl.pawelSz.Spring.Rest.RestService.Util;
 
 
-public class Error {
+public class MyError {
 	 
     private String errorMessage;
  
-    public Error(String errorMessage){
+    public MyError(String errorMessage){
         this.errorMessage = errorMessage;
     }
  

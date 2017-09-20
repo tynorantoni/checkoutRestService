@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
+import pl.pawelSz.Spring.Rest.RestService.Util.MyError;
 
 @RestController
 @RequestMapping("/checkout")
@@ -30,7 +31,7 @@ public class ServoControll {
 		List<Item> items = itemService.showBasket();
 		if (items.isEmpty()) {
 			logger.info("nothing in basket");
-			return new ResponseEntity(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 
 		}
 		logger.info("Something is in");
@@ -39,21 +40,31 @@ public class ServoControll {
 
 	// -------------------Add Item to
 	// basket---------------------------------------------
-	@RequestMapping(value = "/basket", method = RequestMethod.GET)
+	@RequestMapping(value = "/basket/add/name/{name}/{qty}", method = RequestMethod.GET)
 	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable String name, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
+		if (itemService.findItem(name) == null) {
+			logger.error("Item not found. " + name);
+			return new ResponseEntity(new MyError("Unable to add item with name: " + name + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
 		itemService.addToBasket(name, qty);
 		itemService.itemCost(name);
-		logger.info("Added "+qty+" items "+name+" to basket");
+		logger.info("Added " + qty + " items " + name + " to basket");
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/basket/add/id/{id}/{qty}", method = RequestMethod.GET)
 	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable int id, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
+		if (itemService.findItem(id) == null) {
+			logger.error("Item not found. " + id);
+			return new ResponseEntity(new MyError("Unable to add item with id: " + id + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
 		itemService.addToBasket(id, qty);
 		itemService.itemCost(id);
-		logger.info("Added "+qty+" items id: "+id+" to basket");
+		logger.info("Added " + qty + " items id: " + id + " to basket");
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
@@ -63,19 +74,28 @@ public class ServoControll {
 	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable String name) {
 		List<Item> items = itemService.showBasket();
+		if (itemService.findItem(name) == null) {
+			logger.error("Item not found. " + name);
+			return new ResponseEntity(new MyError("Unable to add item with name: " + name + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
 		itemService.removeFromBasket(name);
-		logger.info("Removed item: "+name+" from basket");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/basket/remove/id/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable int id) {
-		List<Item> items = itemService.showBasket();
-		itemService.removeFromBasket(id);
-		logger.info("Removed item: "+id+" from basket");
+		logger.info("Removed item: " + name + " from basket");
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/basket/remove/id/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable int id) {
+		List<Item> items = itemService.showBasket();
+		if (itemService.findItem(id) == null) {
+			logger.error("Item not found. " + id);
+			return new ResponseEntity(new MyError("Unable to add item with id: " + id + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
+		itemService.removeFromBasket(id);
+		logger.info("Removed item: " + id + " from basket");
+		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+	}
 
 	// -------------------Change Quantity Item from
 	// basket------------------------------------------
@@ -83,24 +103,34 @@ public class ServoControll {
 	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
 	public ResponseEntity<List<Item>> removeQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
+		if (itemService.findItem(name) == null) {
+			logger.error("Item not found. " + name);
+			return new ResponseEntity(new MyError("Unable to add item with name: " + name + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
 		for (Item item : items) {
 			if (item.getName().equals(name)) {
 				item.setQuantity(qty);
 			}
 		}
-		logger.info("Changed quantity of item "+name+" to "+qty);
+		logger.info("Changed quantity of item " + name + " to " + qty);
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/basket/change/id/{id}/{qty}", method = RequestMethod.PUT)
 	public ResponseEntity<List<Item>> removeQtyItemFromBasket(@PathVariable int id, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
+		if (itemService.findItem(id) == null) {
+			logger.error("Item not found. " + id);
+			return new ResponseEntity(new MyError("Unable to add item with name: " + id + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
 		for (Item item : items) {
-			if (item.getId()==id) {
+			if (item.getId() == id) {
 				item.setQuantity(qty);
 			}
 		}
-		logger.info("Changed quantity item id: "+id+" to "+qty);
+		logger.info("Changed quantity item id: " + id + " to " + qty);
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
@@ -118,36 +148,35 @@ public class ServoControll {
 	// -------------------Total Cost-------------------------------------------
 	@RequestMapping(value = "/basket/total", method = RequestMethod.GET)
 	public ResponseEntity<?> totalCostFromBasket() {
-		logger.info("Total Cost: "+ itemService.totalCost());
-		
+		logger.info("Total Cost: " + itemService.totalCost());
+
 		return new ResponseEntity<Integer>(itemService.totalCost(), HttpStatus.OK);
 
 	}
-	
-	// -------------------Basket Summary-------------------------------------------
-		@RequestMapping(value = "/basket/summary", method = RequestMethod.GET)
-		public ResponseEntity <String> summaryBasket() {
-			List<Item> items = itemService.showBasket();
-			String result="";
-			for (Item item : items) {
-				result+="Item name: "+item.getName()+" Price: "+item.getPrice()+" quantity: "+item.getQuantity()+" Cost: " 
-								+itemService.itemCost(item.getName())+"\n";
-				
-			}
-			result+="\n Total Cost: "+itemService.totalCost();
-			logger.info(result);
-			return new ResponseEntity<String>(result, HttpStatus.OK);
+
+	// -------------------Basket
+	// Summary-------------------------------------------
+	@RequestMapping(value = "/basket/summary", method = RequestMethod.GET)
+	public ResponseEntity<String> summaryBasket() {
+		List<Item> items = itemService.showBasket();
+		String result = "";
+		for (Item item : items) {
+			result += "Item name: " + item.getName() + " Price: " + item.getPrice() + " quantity: " + item.getQuantity()
+					+ " Cost: " + itemService.itemCost(item.getName()) + "\n";
 
 		}
-/*
- * TODO:
- * 1)add the same object? => change qty 
- * 2) Posprzątanie projektu
- * 3) post?
- * 4) Testy Unit
- * 5) testy Integration
- * 6)UATy
- * 
- * 8) wrzucenie buildera do itema=> prawie że!
- */
+		result += "\n Total Cost: " + itemService.totalCost();
+		logger.info(result);
+		return new ResponseEntity<String>(result, HttpStatus.OK);
+
+	}
+	/*
+	 * TODO:
+	 * 
+	 * 2) Posprzątanie projektu + dokumentacja 
+	 * 3) post? 
+	 * 5) testy Integration 
+	 * 6)UATy
+	 * 
+	 */
 }
