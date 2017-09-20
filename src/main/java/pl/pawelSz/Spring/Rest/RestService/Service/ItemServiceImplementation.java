@@ -189,13 +189,14 @@ public class ItemServiceImplementation implements ItemService {
 			if (item.getId() == id) {
 				if (item.getQuantity() % item.getQtyToDiscount() == 0) {
 					price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount());
+					item.setCost(price);
 				} else {
 					price = item.getQuantity() * item.getPrice();
+					item.setCost(price);
 				}
 			}
 		}
 		return price;
-
 	}
 
 	public int totalCost() {

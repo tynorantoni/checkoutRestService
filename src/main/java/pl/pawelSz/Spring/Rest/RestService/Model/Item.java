@@ -10,10 +10,6 @@ public class Item {
 	private int quantity;
 	private int cost;
 	
-	
-	
-
-	
 
 	public Item(Builder builder) {
 		
