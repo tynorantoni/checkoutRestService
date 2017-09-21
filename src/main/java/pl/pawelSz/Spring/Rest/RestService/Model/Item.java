@@ -1,5 +1,13 @@
 package pl.pawelSz.Spring.Rest.RestService.Model;
 
+/**
+ *
+ * @author Paweł Szymaszek
+ * @version 1.0
+ * @since 21.09.2017
+ *
+ */
+
 public class Item {
 
 	private int id;
@@ -9,73 +17,25 @@ public class Item {
 	private int qtyToDiscount;
 	private int quantity;
 	private int cost;
-	
 
-	public Item(Builder builder) {
-		
-		this.id = builder.id;
-		this.name =  builder.name;
-		this.price =  builder.price;
-		this.specialPrice =  builder.specialPrice;
-		this.qtyToDiscount =  builder.qtyToDiscount;
-		this.quantity =  builder.quantity;
-		this.cost =  builder.cost;
-		
+	public Item(int id, String name, int price, int specialPrice, int qtyToDiscount, int quantity, int cost) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.specialPrice = specialPrice;
+		this.qtyToDiscount = qtyToDiscount;
+		this.quantity = quantity;
+		this.cost = cost;
 	}
 
-	public static class Builder{
-		
-		private int id;
-		private String name;
-		private int price;
-		private int specialPrice;
-		private int qtyToDiscount;
-		private int quantity;
-		private int cost;
-		
-		public Builder id(int id){
-			this.id=id;
-			return this;
-		}
-		public Builder name(String name){
-			this.name=name;
-			return this;
-		}
-		public Builder price(int price){
-			this.price=price;
-			return this;
-		}
-		public Builder specialPrice(int specialPrice){
-			this.specialPrice=specialPrice;
-			return this;
-		}
-		public Builder qtyToDiscount(int qtyToDiscount){
-			this.qtyToDiscount=qtyToDiscount;
-			return this;
-		}
-		public Builder quantity(int quantity){
-			this.quantity=quantity;
-			return this;
-		}
-		public Builder cost(int cost){
-			this.cost=cost;
-			return this;
-		}
-		public Item build(){
-			return new Item(this);
-		}
-		
-	}
-	
 	public int getCost() {
 		return cost;
 	}
 
-
 	public void setCost(int cost) {
 		this.cost = cost;
 	}
-
 
 	public int getId() {
 		return id;
@@ -96,24 +56,31 @@ public class Item {
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public int getPrice() {
 		return price;
 	}
+
 	public void setPrice(int price) {
 		this.price = price;
 	}
+
 	public int getQtyToDiscount() {
 		return qtyToDiscount;
 	}
+
 	public void setQtyToDiscount(int qtyToDiscount) {
 		this.qtyToDiscount = qtyToDiscount;
 	}
+
 	public int getQuantity() {
 		return quantity;
 	}
+
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
@@ -123,10 +90,5 @@ public class Item {
 		return "Item [id=" + id + ", name=" + name + ", price=" + price + ", specialPrice=" + specialPrice
 				+ ", qtyToDiscount=" + qtyToDiscount + ", quantity=" + quantity + ", cost=" + cost + "]";
 	}
-	
-	
-	
-	 
-	
-	
+
 }

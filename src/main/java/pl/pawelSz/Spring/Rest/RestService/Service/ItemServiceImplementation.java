@@ -10,11 +10,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 
+/**
+ *
+ * @author Paweł Szymaszek
+ * @version 1.0
+ * @since 21.09.2017
+ *
+ */
+
 @Service("itemService")
 @Transactional
 public class ItemServiceImplementation implements ItemService {
 
+	/*
+	 * =======================================================================
+	 * Example of ItemSerice interface implementation. Created for example of
+	 * API behavior, with dummy objects - items
+	 * ======================================================================
+	 */
+
 	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
+
 	private static List<Item> items;
 	private static List<Item> basket = new ArrayList<>();
 	static {
@@ -23,20 +39,41 @@ public class ItemServiceImplementation implements ItemService {
 
 	}
 
+	/*
+	 * Method creating dummy objects, used to present the action of RestApi
+	 * 
+	 * @return items list of item objects
+	 */
 	private static List<Item> itemList() {
 		List<Item> items = new ArrayList<>();
-		items.add(new Item.Builder().name("A").id(1).price(40).qtyToDiscount(3).specialPrice(70).build());
-		items.add(new Item.Builder().name("B").id(2).price(10).qtyToDiscount(2).specialPrice(15).build());
-		items.add(new Item.Builder().name("C").id(3).price(30).qtyToDiscount(4).specialPrice(60).build());
-		items.add(new Item.Builder().name("D").id(4).price(25).qtyToDiscount(2).specialPrice(40).build());
+		items.add(new Item(1, "A", 40, 70, 3, 0, 0));
+		items.add(new Item(2, "B", 10, 15, 2, 0, 0));
+		items.add(new Item(3, "C", 30, 60, 4, 0, 0));
+		items.add(new Item(4, "D", 25, 40, 2, 0, 0));
 
 		return items;
 	}
 
+	/*
+	 * Shows basket - list created for item storage
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> showBasket() {
 		return basket;
 	}
 
+	/*
+	 * Add specific item to basket
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @param qty - amount of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> addToBasket(String name, int qty) {
 
 		if (basket.isEmpty()) {
@@ -61,6 +98,16 @@ public class ItemServiceImplementation implements ItemService {
 
 	}
 
+	/*
+	 * Add specific item to basket
+	 * 
+	 * @param id - id of item
+	 * 
+	 * @param qty - amount of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> addToBasket(int id, int qty) {
 		if (basket.isEmpty()) {
 			logger.info("add to empty list");
@@ -84,6 +131,14 @@ public class ItemServiceImplementation implements ItemService {
 
 	}
 
+	/*
+	 * Remove specific item from basket
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> removeFromBasket(String name) {
 		if (basket.isEmpty()) {
 
@@ -102,6 +157,14 @@ public class ItemServiceImplementation implements ItemService {
 		return basket;
 	}
 
+	/*
+	 * Remove specific item from basket
+	 * 
+	 * @param id - id of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> removeFromBasket(int id) {
 		if (basket.isEmpty()) {
 
@@ -120,6 +183,16 @@ public class ItemServiceImplementation implements ItemService {
 		return basket;
 	}
 
+	/*
+	 * Modifies quantity of specific item in the basket
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @param qty - new amount of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> modifyOrder(String name, int qty) {
 		if (qty == 0) {
 			this.removeFromBasket(name);
@@ -134,6 +207,16 @@ public class ItemServiceImplementation implements ItemService {
 
 	}
 
+	/*
+	 * Modifies quantity of specific item in the basket
+	 * 
+	 * @param id - id of item
+	 * 
+	 * @param qty - new amount of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
 	public List<Item> modifyOrder(int id, int qty) {
 		if (qty == 0) {
 			this.removeFromBasket(id);
@@ -148,6 +231,14 @@ public class ItemServiceImplementation implements ItemService {
 
 	}
 
+	/*
+	 * Searches for specific item
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @return item list or null if item not found
+	 *
+	 */
 	public Item findItem(String name) {
 		for (Item item : items) {
 			if (item.getName().equals(name)) {
@@ -157,6 +248,14 @@ public class ItemServiceImplementation implements ItemService {
 		return null;
 	}
 
+	/*
+	 * Searches for specific item
+	 * 
+	 * @param id - id of item
+	 * 
+	 * @return item list or null if item not found
+	 *
+	 */
 	public Item findItem(int id) {
 		for (Item item : items) {
 			if (item.getId() == id) {
@@ -166,6 +265,13 @@ public class ItemServiceImplementation implements ItemService {
 		return null;
 	}
 
+	/*
+	 * Method calculating cost of added or modified item
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @return price - cost of selected item
+	 */
 	public int itemCost(String name) {
 		int price = 0;
 		for (Item item : basket) {
@@ -183,6 +289,13 @@ public class ItemServiceImplementation implements ItemService {
 
 	}
 
+	/*
+	 * Method calculating cost of added or modified item
+	 * 
+	 * @param id - id of item
+	 * 
+	 * @return price - cost of selected item
+	 */
 	public int itemCost(int id) {
 		int price = 0;
 		for (Item item : basket) {
@@ -199,6 +312,11 @@ public class ItemServiceImplementation implements ItemService {
 		return price;
 	}
 
+	/*
+	 * Calculates total cost of items from basket
+	 * 
+	 * @return total - total price of items
+	 */
 	public int totalCost() {
 		int total = 0;
 		for (Item item : basket) {
@@ -207,6 +325,9 @@ public class ItemServiceImplementation implements ItemService {
 		return total;
 	}
 
+	/*
+	 * Removing all items from basket list
+	 */
 	public void removeAllFromBasket() {
 		basket.clear();
 

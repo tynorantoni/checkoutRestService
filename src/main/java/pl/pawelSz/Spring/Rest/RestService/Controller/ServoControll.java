@@ -16,6 +16,14 @@ import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
 import pl.pawelSz.Spring.Rest.RestService.Util.MyError;
 
+/**
+ *
+ * @author Paweł Szymaszek
+ * @version 1.0
+ * @since 21.09.2017
+ *
+ */
+
 @RestController
 @RequestMapping("/checkout")
 public class ServoControll {
@@ -25,7 +33,9 @@ public class ServoControll {
 	@Autowired
 	ItemServiceImplementation itemService;
 
-	// -------------------------Show Basket------------------------
+	/*
+	 * Show Basket
+	 */
 	@RequestMapping(value = "/basket", method = RequestMethod.GET)
 	public ResponseEntity<List<Item>> showCart() {
 		List<Item> items = itemService.showBasket();
@@ -34,12 +44,18 @@ public class ServoControll {
 			return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 
 		}
-		logger.info("Something is in");
+		logger.info("something is in");
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
-	// -------------------Add Item to
-	// basket---------------------------------------------
+	/*
+	 * Add Item to basket
+	 * 
+	 * @param name
+	 * 
+	 * @param qty
+	 * 
+	 */
 	@RequestMapping(value = "/basket/add/name/{name}/{qty}", method = RequestMethod.GET)
 	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable String name, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
@@ -59,6 +75,14 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
+	/*
+	 * Add Item to basket
+	 * 
+	 * @param id
+	 * 
+	 * @param qty
+	 * 
+	 */
 	@RequestMapping(value = "/basket/add/id/{id}/{qty}", method = RequestMethod.GET)
 	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable int id, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
@@ -78,9 +102,14 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
-	// -------------------Remove Item from
-	// basket------------------------------------------
-
+	/*
+	 * Remove Item from basket
+	 * 
+	 * @param name
+	 * 
+	 * @param qty
+	 * 
+	 */
 	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable String name) {
 		List<Item> items = itemService.showBasket();
@@ -93,6 +122,15 @@ public class ServoControll {
 		logger.info("Removed item: " + name + " from basket");
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
+
+	/*
+	 * Remove Item from basket
+	 * 
+	 * @param id
+	 * 
+	 * @param qty
+	 * 
+	 */
 
 	@RequestMapping(value = "/basket/remove/id/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable int id) {
@@ -107,8 +145,14 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
-	// -------------------Change Quantity Item from
-	// basket------------------------------------------
+	/*
+	 * Change amount of Item in basket
+	 * 
+	 * @param name
+	 * 
+	 * @param qty
+	 * 
+	 */
 
 	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
 	public ResponseEntity<List<Item>> modifyQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
@@ -133,6 +177,14 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
+	/*
+	 * Change amount of Item in basket
+	 * 
+	 * @param id
+	 * 
+	 * @param qty
+	 * 
+	 */
 	@RequestMapping(value = "/basket/change/id/{id}/{qty}", method = RequestMethod.PUT)
 	public ResponseEntity<List<Item>> modifyQtyItemFromBasket(@PathVariable int id, @PathVariable int qty) {
 		List<Item> items = itemService.showBasket();
@@ -156,8 +208,10 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
-	// -------------------Remove all Items from
-	// basket------------------------------------------
+	/*
+	 * Remove all Items from basket
+	 * 
+	 */
 
 	@RequestMapping(value = "/basket/remove/all", method = RequestMethod.DELETE)
 	public ResponseEntity<List<Item>> removeAllItemsFromBasket() {
@@ -167,7 +221,9 @@ public class ServoControll {
 		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
 	}
 
-	// -------------------Total Cost-------------------------------------------
+	/*
+	 * Get total cost of all items in basket
+	 */
 	@RequestMapping(value = "/basket/total", method = RequestMethod.GET)
 	public ResponseEntity<?> totalCostFromBasket() {
 		logger.info("Total Cost: " + itemService.totalCost());
@@ -176,8 +232,9 @@ public class ServoControll {
 
 	}
 
-	// -------------------Basket
-	// Summary-------------------------------------------
+	/*
+	 * Get summary of items in basket
+	 */
 	@RequestMapping(value = "/basket/summary", method = RequestMethod.GET)
 	public ResponseEntity<String> summaryBasket() {
 		List<Item> items = itemService.showBasket();
@@ -192,13 +249,4 @@ public class ServoControll {
 		return new ResponseEntity<String>(result, HttpStatus.OK);
 
 	}
-
-	/*
-	 * TODO:
-	 * 
-	 * 2) Posprzątanie projektu + dokumentacja 3) post?
-	 * 
-	 * 6)UATy
-	 * 
-	 */
 }

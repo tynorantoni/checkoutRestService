@@ -4,9 +4,17 @@ import java.util.List;
 
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 
+/**
+ *
+ * @author Paweł Szymaszek
+ * @version 1.0
+ * @since 21.09.2017
+ *
+ */
+
 public interface ItemService {
-	
-	List<Item>showBasket();
+
+	List<Item> showBasket();
 
 	List<Item> addToBasket(String name, int qty);
 
@@ -29,7 +37,7 @@ public interface ItemService {
 	int itemCost(int id);
 
 	int totalCost();
-	
+
 	void removeAllFromBasket();
 
 }
