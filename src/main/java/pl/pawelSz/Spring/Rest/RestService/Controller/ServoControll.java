@@ -162,9 +162,9 @@ public class ServoControll {
 			return new ResponseEntity(new MyError("Unable to modify item with name: " + name + " not found."),
 					HttpStatus.NOT_FOUND);
 		}
-		if (qty <= 0) {
+		if (qty < 0) {
 			logger.error("Quantity must be bigger than 0, qty=" + qty);
-			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger than zero"),
+			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
 					HttpStatus.NOT_FOUND);
 		}
 		for (Item item : items) {
@@ -193,9 +193,9 @@ public class ServoControll {
 			return new ResponseEntity(new MyError("Unable to modify item with id: " + id + " not found."),
 					HttpStatus.NOT_FOUND);
 		}
-		if (qty <= 0) {
+		if (qty < 0) {
 			logger.error("Quantity must be bigger than 0, qty=" + qty);
-			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger than zero"),
+			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
 					HttpStatus.NOT_FOUND);
 		}
 		for (Item item : items) {

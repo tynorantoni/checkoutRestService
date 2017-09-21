@@ -110,7 +110,7 @@ public class ItemServiceImplTest {
 		int qty = 5;
 		cart.add(findItem(name));
 		cart.get(cart.size() - 1).setQuantity(qty);
-
+		
 		assertEquals(testItems.get(0), cart.get(0));
 
 	}

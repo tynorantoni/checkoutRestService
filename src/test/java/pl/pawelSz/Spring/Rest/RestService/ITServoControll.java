@@ -32,6 +32,11 @@ public class ITServoControll {
 
 	@LocalServerPort
 	private int port;
+	
+	private String createURLWithPort(String uri) {
+		
+		return "http://localhost:" + port + uri;
+	}
 
 	TestRestTemplate restTemplate = new TestRestTemplate();
 
@@ -44,13 +49,14 @@ public class ITServoControll {
 	 * ==================================================
 	 */
 
+	
 	/*
 	 * Test of showCart method, ServoControll.class
 	 */
 	@Test
 	public void testCShowCart() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket"), HttpMethod.GET,
 				entity, String.class);
@@ -67,7 +73,7 @@ public class ITServoControll {
 	@Test
 	public void testAAddItemToBasketA() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/add/name/A/3"),
 				HttpMethod.GET, entity, String.class);
@@ -83,7 +89,7 @@ public class ITServoControll {
 	@Test
 	public void testBAddItemToBasketB() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/add/id/2/10"),
 				HttpMethod.GET, entity, String.class);
@@ -100,7 +106,7 @@ public class ITServoControll {
 	@Test
 	public void testHRemoveItemFromBasketA() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/remove/name/B/"),
 				HttpMethod.DELETE, entity, String.class);
@@ -117,7 +123,7 @@ public class ITServoControll {
 	@Test
 	public void testIRemoveItemFromBasketB() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/remove/id/3/"),
 				HttpMethod.DELETE, entity, String.class);
@@ -134,7 +140,7 @@ public class ITServoControll {
 	@Test
 	public void testDModifyItemFromBasketA() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/change/name/A/10"),
 				HttpMethod.PUT, entity, String.class);
@@ -152,7 +158,7 @@ public class ITServoControll {
 	@Test
 	public void testEModifyItemFromBasketB() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/change/id/2/15"),
 				HttpMethod.PUT, entity, String.class);
@@ -170,7 +176,7 @@ public class ITServoControll {
 	@Test
 	public void testJRemoveAllItemsFromBasket() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/remove/all"),
 				HttpMethod.DELETE, entity, String.class);
@@ -186,7 +192,7 @@ public class ITServoControll {
 	@Test
 	public void testFTotalCost() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/total"),
 				HttpMethod.GET, entity, String.class);
@@ -202,7 +208,7 @@ public class ITServoControll {
 	@Test
 	public void testGBasketSummary() {
 
-		HttpEntity<String> entity = new HttpEntity<String>(null, headers);
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/summary"),
 				HttpMethod.GET, entity, String.class);
@@ -212,9 +218,4 @@ public class ITServoControll {
 		assertEquals(expected, response.getBody());
 
 	}
-
-	private String createURLWithPort(String uri) {
-		return "http://localhost:" + port + uri;
-	}
-
 }
