@@ -1,18 +1,25 @@
 package pl.pawelSz.Spring.Rest.RestService.Controller;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import pl.pawelSz.Spring.Rest.RestService.Model.Basket;
+import pl.pawelSz.Spring.Rest.RestService.Model.BasketRepository;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
+import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
 import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
 import pl.pawelSz.Spring.Rest.RestService.Util.MyError;
 
@@ -24,28 +31,65 @@ import pl.pawelSz.Spring.Rest.RestService.Util.MyError;
  *
  */
 
-@RestController
+@Controller
 @RequestMapping("/checkout")
 public class ServoControll {
 
 	public static final Logger logger = LoggerFactory.getLogger(ServoControll.class);
 
 	@Autowired
+	ItemRepository itemRepository;
+	@Autowired
+	BasketRepository basketRepository;
+	@Autowired
 	ItemServiceImplementation itemService;
+	
+	//==========================================================================
+	//TESTING ORM DB MySQL
+	//==========================================================================
+	@GetMapping(path="/buy")
+	public @ResponseBody String buyProds() {
+		Item x = itemRepository.findOne(1l);
+		Basket b = new Basket(1, 3, 467, x);
+		basketRepository.save(b);
+		return "Bought";
+	}
 
+	@GetMapping(path="/add") 
+	public @ResponseBody String addNew () {
+		
+		Item a = new Item(1, "A", 40, 70, 3);
+		Item b = new Item(2, "B", 20, 25, 2);
+		Item c = new Item(3, "C", 10, 15, 4);
+		itemRepository.save(a);
+		itemRepository.save(b);
+		itemRepository.save(c);
+		return "Saved";
+	}
+	
+	@GetMapping(path="/show")
+	public @ResponseBody Iterable<Basket> showProds() {
+		
+		return basketRepository.findAll();
+	}
+	//========================================================================
+	
+	
+	
+	
 	/*
 	 * Show Basket
 	 */
 	@RequestMapping(value = "/basket", method = RequestMethod.GET)
-	public ResponseEntity<List<Item>> showCart() {
-		List<Item> items = itemService.showBasket();
-		if (items.isEmpty()) {
+	public ResponseEntity<Iterable<Basket>> showCart() {
+		
+		if (basketRepository.count()==0) { //TODO check this
 			logger.info("nothing in basket");
-			return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+			return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(),HttpStatus.OK);
 
 		}
 		logger.info("something is in");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(),HttpStatus.OK);
 	}
 
 	/*
@@ -214,11 +258,10 @@ public class ServoControll {
 	 */
 
 	@RequestMapping(value = "/basket/remove/all", method = RequestMethod.DELETE)
-	public ResponseEntity<List<Item>> removeAllItemsFromBasket() {
-		List<Item> items = itemService.showBasket();
-		itemService.removeAllFromBasket();
+	public ResponseEntity<Iterable<Basket>> removeAllItemsFromBasket() {
+		basketRepository.deleteAll();
 		logger.info("Removed everything from basket");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(basketRepository.findAll(), HttpStatus.OK);
 	}
 
 	/*

@@ -1,5 +1,10 @@
 package pl.pawelSz.Spring.Rest.RestService.Model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  *
  * @author Paweł Szymaszek
@@ -7,41 +12,35 @@ package pl.pawelSz.Spring.Rest.RestService.Model;
  * @since 21.09.2017
  *
  */
-
+@Entity
 public class Item {
-
-	private int id;
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private long id;
 	private String name;
 	private int price;
 	private int specialPrice;
 	private int qtyToDiscount;
-	private int quantity;
-	private int cost;
 
-	public Item(int id, String name, int price, int specialPrice, int qtyToDiscount, int quantity, int cost) {
+	public Item(){};
+	
+	public Item(long id, String name, int price, int specialPrice, int qtyToDiscount) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.price = price;
 		this.specialPrice = specialPrice;
 		this.qtyToDiscount = qtyToDiscount;
-		this.quantity = quantity;
-		this.cost = cost;
 	}
+	
+	
 
-	public int getCost() {
-		return cost;
-	}
-
-	public void setCost(int cost) {
-		this.cost = cost;
-	}
-
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -77,18 +76,5 @@ public class Item {
 		this.qtyToDiscount = qtyToDiscount;
 	}
 
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
-	@Override
-	public String toString() {
-		return "Item [id=" + id + ", name=" + name + ", price=" + price + ", specialPrice=" + specialPrice
-				+ ", qtyToDiscount=" + qtyToDiscount + ", quantity=" + quantity + ", cost=" + cost + "]";
-	}
-
+	
 }

@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import pl.pawelSz.Spring.Rest.RestService.Model.Basket;
+import pl.pawelSz.Spring.Rest.RestService.Model.BasketRepository;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 
 /**
@@ -30,29 +33,11 @@ public class ItemServiceImplementation implements ItemService {
 	 */
 
 	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
-
-	private static List<Item> items;
-	private static List<Item> basket = new ArrayList<>();
-	static {
-
-		items = itemList();
-
-	}
-
-	/*
-	 * Method creating dummy objects, used to present the action of RestApi
-	 * 
-	 * @return items list of item objects
-	 */
-	private static List<Item> itemList() {
-		List<Item> items = new ArrayList<>();
-		items.add(new Item(1, "A", 40, 70, 3, 0, 0));
-		items.add(new Item(2, "B", 10, 15, 2, 0, 0));
-		items.add(new Item(3, "C", 30, 60, 4, 0, 0));
-		items.add(new Item(4, "D", 25, 40, 2, 0, 0));
-
-		return items;
-	}
+	
+	@Autowired
+	private BasketRepository basketRepository;
+//	private static List<Item> basket = new ArrayList<>(); TODO delete
+	
 
 	/*
 	 * Shows basket - list created for item storage
@@ -60,8 +45,8 @@ public class ItemServiceImplementation implements ItemService {
 	 * @return basket list
 	 * 
 	 */
-	public List<Item> showBasket() {
-		return basket;
+	public Iterable<Basket> showBasket() {
+		return basketRepository.findAll();
 	}
 
 	/*
@@ -276,14 +261,9 @@ public class ItemServiceImplementation implements ItemService {
 		int price = 0;
 		for (Item item : basket) {
 			if (item.getName().equals(name)) {
-				if (item.getQuantity() % item.getQtyToDiscount() == 0) {
-					price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount());
-					item.setCost(price);
-				} else {
-					price = item.getQuantity() * item.getPrice();
-					item.setCost(price);
-				}
+				price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount())+item.getPrice()*(item.getQuantity() % item.getQtyToDiscount());
 			}
+			item.setCost(price);
 		}
 		return price;
 
@@ -300,14 +280,9 @@ public class ItemServiceImplementation implements ItemService {
 		int price = 0;
 		for (Item item : basket) {
 			if (item.getId() == id) {
-				if (item.getQuantity() % item.getQtyToDiscount() == 0) {
-					price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount());
-					item.setCost(price);
-				} else {
-					price = item.getQuantity() * item.getPrice();
-					item.setCost(price);
-				}
+				price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount())+item.getPrice()*(item.getQuantity() % item.getQtyToDiscount());
 			}
+			item.setCost(price);
 		}
 		return price;
 	}

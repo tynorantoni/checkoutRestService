@@ -2,6 +2,7 @@ package pl.pawelSz.Spring.Rest.RestService.Service;
 
 import java.util.List;
 
+import pl.pawelSz.Spring.Rest.RestService.Model.Basket;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 
 /**
@@ -14,7 +15,7 @@ import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 
 public interface ItemService {
 
-	List<Item> showBasket();
+	Iterable<Basket> showBasket();
 
 	List<Item> addToBasket(String name, int qty);
 

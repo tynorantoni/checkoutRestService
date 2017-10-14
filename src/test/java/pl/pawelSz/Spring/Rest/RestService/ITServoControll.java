@@ -111,7 +111,7 @@ public class ITServoControll {
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/remove/name/B/"),
 				HttpMethod.DELETE, entity, String.class);
 
-		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":400}]";
+		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":250}]";
 
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
@@ -128,7 +128,7 @@ public class ITServoControll {
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/remove/id/3/"),
 				HttpMethod.DELETE, entity, String.class);
 
-		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":400}]";
+		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":250}]";
 
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
@@ -145,7 +145,7 @@ public class ITServoControll {
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/change/name/A/10"),
 				HttpMethod.PUT, entity, String.class);
 
-		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":400},"
+		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":250},"
 				+ "{\"id\":2,\"name\":\"B\",\"price\":10,\"specialPrice\":15,\"qtyToDiscount\":2,\"quantity\":10,\"cost\":75}]";
 
 		JSONAssert.assertEquals(expected, response.getBody(), false);
@@ -163,7 +163,7 @@ public class ITServoControll {
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/change/id/2/15"),
 				HttpMethod.PUT, entity, String.class);
 
-		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":400},"
+		String expected = "[{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3,\"quantity\":10,\"cost\":250},"
 				+ "{\"id\":2,\"name\":\"B\",\"price\":10,\"specialPrice\":15,\"qtyToDiscount\":2,\"quantity\":15,\"cost\":150}]";
 
 		JSONAssert.assertEquals(expected, response.getBody(), false);
@@ -213,7 +213,7 @@ public class ITServoControll {
 		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/summary"),
 				HttpMethod.GET, entity, String.class);
 
-		String expected = "Item name: A Price: 40 quantity: 10 Cost: 400\n"
+		String expected = "Item name: A Price: 40 quantity: 10 Cost: 250\n"
 				+ "Item name: B Price: 10 quantity: 15 Cost: 150\n" + "\n Total Cost: 550";
 		assertEquals(expected, response.getBody());
 
