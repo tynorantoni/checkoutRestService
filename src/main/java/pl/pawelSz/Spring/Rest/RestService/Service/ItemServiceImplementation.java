@@ -33,8 +33,16 @@ public class ItemServiceImplementation implements ItemService {
 	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
 
 	@Autowired
-	private BasketRepository basketRepository;
+    public void setItemRepository(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
 	@Autowired
+    public void setBasketRepository(BasketRepository basketRepository) {
+        this.basketRepository = basketRepository;
+    }
+//	@Autowired
+	private BasketRepository basketRepository;
+//	@Autowired
 	private ItemRepository itemRepository;
 
 	/*
@@ -60,7 +68,7 @@ public class ItemServiceImplementation implements ItemService {
 	 */
 	public Iterable<Basket> addToBasket(String name, int qty) {
 		
-		if (!basketRepository.exists(itemRepository.findOne(findItem(name).getId()).getId())) { // findItem(name).getId()
+		if (!basketRepository.exists(findItem(name).getId())) { // findItem(name).getId()
 																								// ?
 			logger.info("add to empty list");
 			basketRepository.save(new Basket(qty, itemCost(name, qty), findItem(name)));
