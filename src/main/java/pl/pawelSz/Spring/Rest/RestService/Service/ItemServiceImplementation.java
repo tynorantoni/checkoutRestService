@@ -1,7 +1,6 @@
 package pl.pawelSz.Spring.Rest.RestService.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pawelSz.Spring.Rest.RestService.Model.Basket;
 import pl.pawelSz.Spring.Rest.RestService.Model.BasketRepository;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
+import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
 
 /**
  *
@@ -33,11 +33,11 @@ public class ItemServiceImplementation implements ItemService {
 	 */
 
 	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
-	
+
 	@Autowired
 	private BasketRepository basketRepository;
-//	private static List<Item> basket = new ArrayList<>(); TODO delete
-	
+	@Autowired
+	private ItemRepository itemRepository;
 
 	/*
 	 * Shows basket - list created for item storage
@@ -59,27 +59,19 @@ public class ItemServiceImplementation implements ItemService {
 	 * @return basket list
 	 * 
 	 */
-	public List<Item> addToBasket(String name, int qty) {
-
-		if (basket.isEmpty()) {
+	public Iterable<Basket> addToBasket(String name, int qty) {
+		long idO = 0;
+		if (!basketRepository.exists(itemRepository.findOne(findItem(name).getId()).getId())) {
 			logger.info("add to empty list");
-			basket.add(findItem(name));
-			basket.get(basket.size() - 1).setQuantity(qty);
-
-		} else {
-			for (int i = 0; i < basket.size(); i++) {
-
-				if (basket.get(i).getName().equals(name)) {
-					logger.info("modify");
-					modifyOrder(name, qty + basket.get(i).getQuantity());
-					return basket;
-				}
-			}
+			basketRepository.save(new Basket(idO, qty, itemCost(name, qty), findItem(name)));
 			logger.info("adding ");
-			basket.add(findItem(name));
-			basket.get(basket.size() - 1).setQuantity(qty);
 		}
-		return basket;
+		
+		modifyOrder(findItem(name).getId(), qty);
+
+		logger.info("modify");
+
+		return showBasket();
 
 	}
 
@@ -93,53 +85,19 @@ public class ItemServiceImplementation implements ItemService {
 	 * @return basket list
 	 * 
 	 */
-	public List<Item> addToBasket(int id, int qty) {
-		if (basket.isEmpty()) {
+	public Iterable<Basket> addToBasket(long id, int qty) {
+		long idO = 0;
+		if (!basketRepository.exists(id)) {
 			logger.info("add to empty list");
-			basket.add(findItem(id));
-			basket.get(basket.size() - 1).setQuantity(qty);
-
-		} else {
-			for (int i = 0; i < basket.size(); i++) {
-
-				if (basket.get(i).getId() == id) {
-					logger.info("modify");
-					modifyOrder(id, qty + basket.get(i).getQuantity());
-					return basket;
-				}
-			}
-			logger.info("adding object ");
-			basket.add(findItem(id));
-			basket.get(basket.size() - 1).setQuantity(qty);
-		}
-		return basket;
-
-	}
-
-	/*
-	 * Remove specific item from basket
-	 * 
-	 * @param name - name of item
-	 * 
-	 * @return basket list
-	 * 
-	 */
-	public List<Item> removeFromBasket(String name) {
-		if (basket.isEmpty()) {
-
-			return basket;
-		} else {
-			for (int i = 0; i < basket.size(); i++) {
-
-				if (basket.get(i).getName().equals(name)) {
-					logger.info("delete");
-					basket.remove(i);
-					return basket;
-				}
-			}
+			basketRepository.save(new Basket(idO, qty, itemCost(id, qty), findItem(id)));
 
 		}
-		return basket;
+		modifyOrder(id, qty);
+
+		logger.info("modify");
+
+		return showBasket();
+
 	}
 
 	/*
@@ -150,46 +108,16 @@ public class ItemServiceImplementation implements ItemService {
 	 * @return basket list
 	 * 
 	 */
-	public List<Item> removeFromBasket(int id) {
-		if (basket.isEmpty()) {
+	public Iterable<Basket> removeFromBasket(long id) {
+		if (basketRepository.count() == 0) {
 
-			return basket;
-		} else {
-			for (int i = 0; i < basket.size(); i++) {
-
-				if (basket.get(i).getId() == id) {
-					logger.info("delete");
-					basket.remove(i);
-					return basket;
-				}
-			}
-
+			return showBasket();
 		}
-		return basket;
-	}
+		basketRepository.delete(id);
 
-	/*
-	 * Modifies quantity of specific item in the basket
-	 * 
-	 * @param name - name of item
-	 * 
-	 * @param qty - new amount of item
-	 * 
-	 * @return basket list
-	 * 
-	 */
-	public List<Item> modifyOrder(String name, int qty) {
-		if (qty == 0) {
-			this.removeFromBasket(name);
-		} else {
-			for (Item item : basket) {
-				if (item.getName().equals(name)) {
-					item.setQuantity(qty);
-				}
-			}
-		}
-		return basket;
+		logger.info("delete");
 
+		return showBasket();
 	}
 
 	/*
@@ -202,17 +130,13 @@ public class ItemServiceImplementation implements ItemService {
 	 * @return basket list
 	 * 
 	 */
-	public List<Item> modifyOrder(int id, int qty) {
+	public Iterable<Basket> modifyOrder(long id, int qty) {
 		if (qty == 0) {
-			this.removeFromBasket(id);
-		} else {
-			for (Item item : basket) {
-				if (item.getId() == id) {
-					item.setQuantity(qty);
-				}
-			}
+			removeFromBasket(id);
 		}
-		return basket;
+		basketRepository.findOne(id).setQuantity(qty);
+
+		return showBasket();
 
 	}
 
@@ -225,7 +149,8 @@ public class ItemServiceImplementation implements ItemService {
 	 *
 	 */
 	public Item findItem(String name) {
-		for (Item item : items) {
+
+		for (Item item : itemRepository.findAll()) {
 			if (item.getName().equals(name)) {
 				return item;
 			}
@@ -241,11 +166,9 @@ public class ItemServiceImplementation implements ItemService {
 	 * @return item list or null if item not found
 	 *
 	 */
-	public Item findItem(int id) {
-		for (Item item : items) {
-			if (item.getId() == id) {
-				return item;
-			}
+	public Item findItem(long id) {
+		if (itemRepository.exists(id)) {
+			return itemRepository.findOne(id);
 		}
 		return null;
 	}
@@ -257,14 +180,13 @@ public class ItemServiceImplementation implements ItemService {
 	 * 
 	 * @return price - cost of selected item
 	 */
-	public int itemCost(String name) {
+	public int itemCost(String name, int qty) {
+
 		int price = 0;
-		for (Item item : basket) {
-			if (item.getName().equals(name)) {
-				price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount())+item.getPrice()*(item.getQuantity() % item.getQtyToDiscount());
-			}
-			item.setCost(price);
-		}
+		findItem(name);
+		price = findItem(name).getSpecialPrice() * (qty / findItem(name).getQtyToDiscount())
+				+ findItem(name).getPrice() * (qty % findItem(name).getQtyToDiscount());
+
 		return price;
 
 	}
@@ -276,14 +198,13 @@ public class ItemServiceImplementation implements ItemService {
 	 * 
 	 * @return price - cost of selected item
 	 */
-	public int itemCost(int id) {
+	public int itemCost(long id, int qty) {
+
 		int price = 0;
-		for (Item item : basket) {
-			if (item.getId() == id) {
-				price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount())+item.getPrice()*(item.getQuantity() % item.getQtyToDiscount());
-			}
-			item.setCost(price);
-		}
+		findItem(id);
+		price = findItem(id).getSpecialPrice() * (qty / findItem(id).getQtyToDiscount())
+				+ findItem(id).getPrice() * (qty % findItem(id).getQtyToDiscount());
+
 		return price;
 	}
 
@@ -294,8 +215,8 @@ public class ItemServiceImplementation implements ItemService {
 	 */
 	public int totalCost() {
 		int total = 0;
-		for (Item item : basket) {
-			total += itemCost(item.getName());
+		for (Basket basket : basketRepository.findAll()) {
+			total += basket.getCost();
 		}
 		return total;
 	}
@@ -304,7 +225,7 @@ public class ItemServiceImplementation implements ItemService {
 	 * Removing all items from basket list
 	 */
 	public void removeAllFromBasket() {
-		basket.clear();
+		basketRepository.deleteAll();
 
 	}
 

@@ -17,25 +17,21 @@ public interface ItemService {
 
 	Iterable<Basket> showBasket();
 
-	List<Item> addToBasket(String name, int qty);
+	Iterable<Basket> addToBasket(String name, int qty);
 
-	List<Item> addToBasket(int id, int qty);
+	Iterable<Basket> addToBasket(long id, int qty);
 
-	List<Item> removeFromBasket(String name);
+	Iterable<Basket> removeFromBasket(long id);
 
-	List<Item> removeFromBasket(int id);
-
-	List<Item> modifyOrder(String name, int qty);
-
-	List<Item> modifyOrder(int id, int qty);
+	Iterable<Basket> modifyOrder(long id, int qty);
 
 	Item findItem(String name);
 
-	Item findItem(int id);
+	Item findItem(long id);
 
-	int itemCost(String name);
+	int itemCost(String name,int qty);
 
-	int itemCost(int id);
+	int itemCost(long id,int qty);
 
 	int totalCost();
 

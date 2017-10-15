@@ -1,9 +1,5 @@
 package pl.pawelSz.Spring.Rest.RestService.Controller;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,11 +55,13 @@ public class ServoControll {
 	public @ResponseBody String addNew () {
 		
 		Item a = new Item(1, "A", 40, 70, 3);
-		Item b = new Item(2, "B", 20, 25, 2);
-		Item c = new Item(3, "C", 10, 15, 4);
+		Item b = new Item(2, "B", 10, 15, 2);
+		Item c = new Item(3, "C", 30, 60, 4);
+		Item d = new Item(4, "D", 25, 40, 2);
 		itemRepository.save(a);
 		itemRepository.save(b);
 		itemRepository.save(c);
+		itemRepository.save(d);
 		return "Saved";
 	}
 	
@@ -83,7 +81,7 @@ public class ServoControll {
 	@RequestMapping(value = "/basket", method = RequestMethod.GET)
 	public ResponseEntity<Iterable<Basket>> showCart() {
 		
-		if (basketRepository.count()==0) { //TODO check this
+		if (itemService.showBasket().equals(null)) { //TODO check this
 			logger.info("nothing in basket");
 			return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(),HttpStatus.OK);
 
@@ -101,8 +99,8 @@ public class ServoControll {
 	 * 
 	 */
 	@RequestMapping(value = "/basket/add/name/{name}/{qty}", method = RequestMethod.GET)
-	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable String name, @PathVariable int qty) {
-		List<Item> items = itemService.showBasket();
+	public ResponseEntity<Iterable<Basket>> addItemToBasket(@PathVariable String name, @PathVariable int qty) {
+		
 		if (itemService.findItem(name) == null) {
 			logger.error("Item not found. " + name);
 			return new ResponseEntity(new MyError("Unable to add item with name: " + name + " not found."),
@@ -114,9 +112,9 @@ public class ServoControll {
 					HttpStatus.NOT_FOUND);
 		}
 		itemService.addToBasket(name, qty);
-		itemService.itemCost(name);
+		
 		logger.info("Added " + qty + " items " + name + " to basket");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
 	}
 
 	/*
@@ -128,8 +126,8 @@ public class ServoControll {
 	 * 
 	 */
 	@RequestMapping(value = "/basket/add/id/{id}/{qty}", method = RequestMethod.GET)
-	public ResponseEntity<List<Item>> addItemToBasket(@PathVariable int id, @PathVariable int qty) {
-		List<Item> items = itemService.showBasket();
+	public ResponseEntity<Iterable<Basket>> addItemToBasket(@PathVariable long id, @PathVariable int qty) {
+		
 		if (itemService.findItem(id) == null) {
 			logger.error("Item not found. " + id);
 			return new ResponseEntity(new MyError("Unable to add item with id: " + id + " not found."),
@@ -141,9 +139,9 @@ public class ServoControll {
 					HttpStatus.NOT_FOUND);
 		}
 		itemService.addToBasket(id, qty);
-		itemService.itemCost(id);
+		
 		logger.info("Added " + qty + " items id: " + id + " to basket");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
 	}
 
 	/*
@@ -154,18 +152,18 @@ public class ServoControll {
 	 * @param qty
 	 * 
 	 */
-	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
-	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable String name) {
-		List<Item> items = itemService.showBasket();
-		if (itemService.findItem(name) == null) {
-			logger.error("Item not found. " + name);
-			return new ResponseEntity(new MyError("Unable to remove item with name: " + name + " not found."),
-					HttpStatus.NOT_FOUND);
-		}
-		itemService.removeFromBasket(name);
-		logger.info("Removed item: " + name + " from basket");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
-	}
+//	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
+//	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable String name) {
+//		List<Item> items = itemService.showBasket();
+//		if (itemService.findItem(name) == null) {
+//			logger.error("Item not found. " + name);
+//			return new ResponseEntity(new MyError("Unable to remove item with name: " + name + " not found."),
+//					HttpStatus.NOT_FOUND);
+//		}
+//		itemService.removeFromBasket(name);
+//		logger.info("Removed item: " + name + " from basket");
+//		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+//	}
 
 	/*
 	 * Remove Item from basket
@@ -177,8 +175,8 @@ public class ServoControll {
 	 */
 
 	@RequestMapping(value = "/basket/remove/id/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable int id) {
-		List<Item> items = itemService.showBasket();
+	public ResponseEntity<Iterable<Basket>> removeItemFromBasket(@PathVariable long id) {
+		
 		if (itemService.findItem(id) == null) {
 			logger.error("Item not found. " + id);
 			return new ResponseEntity(new MyError("Unable to remove item with id: " + id + " not found."),
@@ -186,7 +184,7 @@ public class ServoControll {
 		}
 		itemService.removeFromBasket(id);
 		logger.info("Removed item: " + id + " from basket");
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
 	}
 
 	/*
@@ -198,28 +196,23 @@ public class ServoControll {
 	 * 
 	 */
 
-	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
-	public ResponseEntity<List<Item>> modifyQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
-		List<Item> items = itemService.showBasket();
-		if (itemService.findItem(name) == null) {
-			logger.error("Item not found. " + name);
-			return new ResponseEntity(new MyError("Unable to modify item with name: " + name + " not found."),
-					HttpStatus.NOT_FOUND);
-		}
-		if (qty < 0) {
-			logger.error("Quantity must be bigger than 0, qty=" + qty);
-			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
-					HttpStatus.NOT_FOUND);
-		}
-		for (Item item : items) {
-			if (item.getName().equals(name)) {
-				item.setQuantity(qty);
-			}
-		}
-		itemService.itemCost(name);
-		logger.info("Changed quantity of item " + name + " to " + qty);
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
-	}
+//	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
+//	public ResponseEntity<Iterable<Basket>> modifyQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
+//		
+//		if (itemService.findItem(name) == null) {
+//			logger.error("Item not found. " + name);
+//			return new ResponseEntity(new MyError("Unable to modify item with name: " + name + " not found."),
+//					HttpStatus.NOT_FOUND);
+//		}
+//		if (qty < 0) {
+//			logger.error("Quantity must be bigger than 0, qty=" + qty);
+//			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
+//					HttpStatus.NOT_FOUND);
+//		}
+//		itemService.modifyOrder(id, qty);
+//		logger.info("Changed quantity of item " + name + " to " + qty);
+//		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
+//	}
 
 	/*
 	 * Change amount of Item in basket
@@ -230,8 +223,8 @@ public class ServoControll {
 	 * 
 	 */
 	@RequestMapping(value = "/basket/change/id/{id}/{qty}", method = RequestMethod.PUT)
-	public ResponseEntity<List<Item>> modifyQtyItemFromBasket(@PathVariable int id, @PathVariable int qty) {
-		List<Item> items = itemService.showBasket();
+	public ResponseEntity<Iterable<Basket>> modifyQtyItemFromBasket(@PathVariable long id, @PathVariable int qty) {
+		
 		if (itemService.findItem(id) == null) {
 			logger.error("Item not found. " + id);
 			return new ResponseEntity(new MyError("Unable to modify item with id: " + id + " not found."),
@@ -242,14 +235,9 @@ public class ServoControll {
 			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
 					HttpStatus.NOT_FOUND);
 		}
-		for (Item item : items) {
-			if (item.getId() == id) {
-				item.setQuantity(qty);
-			}
-		}
-		itemService.itemCost(id);
+		itemService.modifyOrder(id, qty);
 		logger.info("Changed quantity item id: " + id + " to " + qty);
-		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
 	}
 
 	/*
@@ -259,16 +247,16 @@ public class ServoControll {
 
 	@RequestMapping(value = "/basket/remove/all", method = RequestMethod.DELETE)
 	public ResponseEntity<Iterable<Basket>> removeAllItemsFromBasket() {
-		basketRepository.deleteAll();
+		itemService.removeAllFromBasket();
 		logger.info("Removed everything from basket");
-		return new ResponseEntity<Iterable<Basket>>(basketRepository.findAll(), HttpStatus.OK);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
 	}
 
 	/*
 	 * Get total cost of all items in basket
 	 */
 	@RequestMapping(value = "/basket/total", method = RequestMethod.GET)
-	public ResponseEntity<?> totalCostFromBasket() {
+	public ResponseEntity<Integer> totalCostFromBasket() {
 		logger.info("Total Cost: " + itemService.totalCost());
 
 		return new ResponseEntity<Integer>(itemService.totalCost(), HttpStatus.OK);
@@ -280,11 +268,11 @@ public class ServoControll {
 	 */
 	@RequestMapping(value = "/basket/summary", method = RequestMethod.GET)
 	public ResponseEntity<String> summaryBasket() {
-		List<Item> items = itemService.showBasket();
+		
 		String result = "";
-		for (Item item : items) {
-			result += "Item name: " + item.getName() + " Price: " + item.getPrice() + " quantity: " + item.getQuantity()
-					+ " Cost: " + itemService.itemCost(item.getName()) + "\n";
+		for (Basket basketOrders : itemService.showBasket()) {
+			result += "Item name: " + itemService.findItem(basketOrders.getOrderId()).getName() + " Price: " + itemService.findItem(basketOrders.getOrderId()).getPrice() + " quantity: " + basketOrders.getQuantity()
+					+ " Cost: " + basketOrders.getCost() + "\n";
 
 		}
 		result += "\n Total Cost: " + itemService.totalCost();

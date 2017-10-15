@@ -18,7 +18,7 @@ public class Basket {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int orderId;
+	private long orderId;
 	private int quantity;
 	private int cost;
 	
@@ -31,7 +31,7 @@ public class Basket {
 	public Basket() {
 	}
 
-	public Basket(int orderId, int quantity, int cost,Item items) {
+	public Basket(long orderId, int quantity, int cost,Item items) {
 		super();
 		this.orderId = orderId;
 		this.quantity = quantity;
@@ -39,11 +39,11 @@ public class Basket {
 		this.item = items;
 	}
 
-	public int getOrderId() {
+	public long getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(int orderId) {
+	public void setOrderId(long orderId) {
 		this.orderId = orderId;
 	}
 
