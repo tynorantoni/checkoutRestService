@@ -1,7 +1,5 @@
 package pl.pawelSz.Spring.Rest.RestService.Service;
 
-import java.util.List;
-
 import pl.pawelSz.Spring.Rest.RestService.Model.Basket;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 
@@ -22,8 +20,12 @@ public interface ItemService {
 	Iterable<Basket> addToBasket(long id, int qty);
 
 	Iterable<Basket> removeFromBasket(long id);
+	
+	Iterable<Basket> removeFromBasket(String name);
 
 	Iterable<Basket> modifyOrder(long id, int qty);
+	
+	Iterable<Basket> modifyOrder(String name, int qty);
 
 	Item findItem(String name);
 

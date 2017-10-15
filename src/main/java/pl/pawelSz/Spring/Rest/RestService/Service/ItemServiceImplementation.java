@@ -1,7 +1,5 @@
 package pl.pawelSz.Spring.Rest.RestService.Service;
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +44,7 @@ public class ItemServiceImplementation implements ItemService {
 	 * 
 	 */
 	public Iterable<Basket> showBasket() {
+		
 		return basketRepository.findAll();
 	}
 
@@ -60,15 +59,16 @@ public class ItemServiceImplementation implements ItemService {
 	 * 
 	 */
 	public Iterable<Basket> addToBasket(String name, int qty) {
-		long idO = 0;
-		if (!basketRepository.exists(itemRepository.findOne(findItem(name).getId()).getId())) {
-			logger.info("add to empty list");
-			basketRepository.save(new Basket(idO, qty, itemCost(name, qty), findItem(name)));
-			logger.info("adding ");
-		}
 		
-		modifyOrder(findItem(name).getId(), qty);
+		if (!basketRepository.exists(itemRepository.findOne(findItem(name).getId()).getId())) { // findItem(name).getId()
+																								// ?
+			logger.info("add to empty list");
+			basketRepository.save(new Basket(qty, itemCost(name, qty), findItem(name)));
+			logger.info("adding");
+		}
 
+		modifyOrder(findItem(name).getId(), qty);
+		itemCost(name, qty);
 		logger.info("modify");
 
 		return showBasket();
@@ -86,14 +86,14 @@ public class ItemServiceImplementation implements ItemService {
 	 * 
 	 */
 	public Iterable<Basket> addToBasket(long id, int qty) {
-		long idO = 0;
+		
 		if (!basketRepository.exists(id)) {
 			logger.info("add to empty list");
-			basketRepository.save(new Basket(idO, qty, itemCost(id, qty), findItem(id)));
-
+			basketRepository.save(new Basket(qty, itemCost(id, qty), findItem(id)));
+			logger.info("adding");
 		}
 		modifyOrder(id, qty);
-
+		itemCost(id, qty);
 		logger.info("modify");
 
 		return showBasket();
@@ -121,6 +121,30 @@ public class ItemServiceImplementation implements ItemService {
 	}
 
 	/*
+	 * Remove specific item from basket
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
+
+	public Iterable<Basket> removeFromBasket(String name) {
+		if (basketRepository.count() == 0) {
+
+			return showBasket();
+		}
+		basketRepository.delete(findItem(name).getId()); // to będzie działać
+															// pod warunkiem id
+															// item == id basket
+															// :/
+
+		logger.info("delete");
+
+		return showBasket();
+	}
+
+	/*
 	 * Modifies quantity of specific item in the basket
 	 * 
 	 * @param id - id of item
@@ -135,6 +159,28 @@ public class ItemServiceImplementation implements ItemService {
 			removeFromBasket(id);
 		}
 		basketRepository.findOne(id).setQuantity(qty);
+		itemCost(id, qty);
+
+		return showBasket();
+
+	}
+
+	/*
+	 * Modifies quantity of specific item in the basket
+	 * 
+	 * @param name - name of item
+	 * 
+	 * @param qty - new amount of item
+	 * 
+	 * @return basket list
+	 * 
+	 */
+	public Iterable<Basket> modifyOrder(String name, int qty) {
+		if (qty == 0) {
+			removeFromBasket(name);
+		}
+		basketRepository.findOne(findItem(name).getId()).setQuantity(qty);
+		itemCost(name, qty);
 
 		return showBasket();
 
@@ -183,9 +229,11 @@ public class ItemServiceImplementation implements ItemService {
 	public int itemCost(String name, int qty) {
 
 		int price = 0;
-		findItem(name);
-		price = findItem(name).getSpecialPrice() * (qty / findItem(name).getQtyToDiscount())
-				+ findItem(name).getPrice() * (qty % findItem(name).getQtyToDiscount());
+
+		int modulo = qty % findItem(name).getSpecialPrice();
+
+		price = findItem(name).getPrice() * modulo
+				+ findItem(name).getSpecialPrice() * ((qty - modulo) / findItem(name).getSpecialPrice());
 
 		return price;
 
@@ -201,10 +249,11 @@ public class ItemServiceImplementation implements ItemService {
 	public int itemCost(long id, int qty) {
 
 		int price = 0;
-		findItem(id);
-		price = findItem(id).getSpecialPrice() * (qty / findItem(id).getQtyToDiscount())
-				+ findItem(id).getPrice() * (qty % findItem(id).getQtyToDiscount());
 
+		int modulo = qty % findItem(id).getSpecialPrice();
+
+		price = findItem(id).getPrice() * modulo
+				+ findItem(id).getSpecialPrice() * ((qty - modulo) / findItem(id).getSpecialPrice());
 		return price;
 	}
 

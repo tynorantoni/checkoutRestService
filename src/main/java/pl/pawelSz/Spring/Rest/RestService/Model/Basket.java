@@ -1,16 +1,11 @@
 package pl.pawelSz.Spring.Rest.RestService.Model;
 
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -31,9 +26,8 @@ public class Basket {
 	public Basket() {
 	}
 
-	public Basket(long orderId, int quantity, int cost,Item items) {
-		super();
-		this.orderId = orderId;
+	public Basket(int quantity, int cost,Item items) {
+		
 		this.quantity = quantity;
 		this.cost = cost;
 		this.item = items;

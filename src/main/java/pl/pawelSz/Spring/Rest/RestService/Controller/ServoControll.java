@@ -46,7 +46,7 @@ public class ServoControll {
 	@GetMapping(path="/buy")
 	public @ResponseBody String buyProds() {
 		Item x = itemRepository.findOne(1l);
-		Basket b = new Basket(1, 3, 467, x);
+		Basket b = new Basket(3, 666, x);
 		basketRepository.save(b);
 		return "Bought";
 	}
@@ -54,10 +54,10 @@ public class ServoControll {
 	@GetMapping(path="/add") 
 	public @ResponseBody String addNew () {
 		
-		Item a = new Item(1, "A", 40, 70, 3);
-		Item b = new Item(2, "B", 10, 15, 2);
-		Item c = new Item(3, "C", 30, 60, 4);
-		Item d = new Item(4, "D", 25, 40, 2);
+		Item a = new Item( "A", 40, 70, 3);
+		Item b = new Item( "B", 10, 15, 2);
+		Item c = new Item( "C", 30, 60, 4);
+		Item d = new Item( "D", 25, 40, 2);
 		itemRepository.save(a);
 		itemRepository.save(b);
 		itemRepository.save(c);
@@ -81,7 +81,7 @@ public class ServoControll {
 	@RequestMapping(value = "/basket", method = RequestMethod.GET)
 	public ResponseEntity<Iterable<Basket>> showCart() {
 		
-		if (itemService.showBasket().equals(null)) { //TODO check this
+		if (itemService.showBasket().iterator().hasNext()==false) {
 			logger.info("nothing in basket");
 			return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(),HttpStatus.OK);
 
@@ -152,18 +152,18 @@ public class ServoControll {
 	 * @param qty
 	 * 
 	 */
-//	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
-//	public ResponseEntity<List<Item>> removeItemFromBasket(@PathVariable String name) {
-//		List<Item> items = itemService.showBasket();
-//		if (itemService.findItem(name) == null) {
-//			logger.error("Item not found. " + name);
-//			return new ResponseEntity(new MyError("Unable to remove item with name: " + name + " not found."),
-//					HttpStatus.NOT_FOUND);
-//		}
-//		itemService.removeFromBasket(name);
-//		logger.info("Removed item: " + name + " from basket");
-//		return new ResponseEntity<List<Item>>(items, HttpStatus.OK);
-//	}
+	@RequestMapping(value = "/basket/remove/name/{name}", method = RequestMethod.DELETE)
+	public ResponseEntity<Iterable<Basket>> removeItemFromBasket(@PathVariable String name) {
+		
+		if (itemService.findItem(name) == null) {
+			logger.error("Item not found. " + name);
+			return new ResponseEntity(new MyError("Unable to remove item with name: " + name + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
+		itemService.removeFromBasket(name);
+		logger.info("Removed item: " + name + " from basket");
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
+	}
 
 	/*
 	 * Remove Item from basket
@@ -196,23 +196,23 @@ public class ServoControll {
 	 * 
 	 */
 
-//	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
-//	public ResponseEntity<Iterable<Basket>> modifyQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
-//		
-//		if (itemService.findItem(name) == null) {
-//			logger.error("Item not found. " + name);
-//			return new ResponseEntity(new MyError("Unable to modify item with name: " + name + " not found."),
-//					HttpStatus.NOT_FOUND);
-//		}
-//		if (qty < 0) {
-//			logger.error("Quantity must be bigger than 0, qty=" + qty);
-//			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
-//					HttpStatus.NOT_FOUND);
-//		}
-//		itemService.modifyOrder(id, qty);
-//		logger.info("Changed quantity of item " + name + " to " + qty);
-//		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
-//	}
+	@RequestMapping(value = "/basket/change/name/{name}/{qty}", method = RequestMethod.PUT)
+	public ResponseEntity<Iterable<Basket>> modifyQtyItemFromBasket(@PathVariable String name, @PathVariable int qty) {
+		
+		if (itemService.findItem(name) == null) {
+			logger.error("Item not found. " + name);
+			return new ResponseEntity(new MyError("Unable to modify item with name: " + name + " not found."),
+					HttpStatus.NOT_FOUND);
+		}
+		if (qty < 0) {
+			logger.error("Quantity must be bigger than 0, qty=" + qty);
+			return new ResponseEntity(new MyError("Unable to add item with qty: " + qty + ", must be bigger or equal zero"),
+					HttpStatus.NOT_FOUND);
+		}
+		itemService.modifyOrder(name, qty);
+		logger.info("Changed quantity of item " + name + " to " + qty);
+		return new ResponseEntity<Iterable<Basket>>(itemService.showBasket(), HttpStatus.OK);
+	}
 
 	/*
 	 * Change amount of Item in basket
