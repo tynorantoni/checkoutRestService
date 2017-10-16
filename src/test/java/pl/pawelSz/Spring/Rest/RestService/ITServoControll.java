@@ -2,11 +2,13 @@ package pl.pawelSz.Spring.Rest.RestService;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -14,7 +16,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import pl.pawelSz.Spring.Rest.RestService.Model.Item;
+import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
 
 /**
  *
@@ -28,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = App.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 // Sorting methods in ascending order
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestPropertySource(locations = "classpath:application.properties")
 public class ITServoControll {
 
 	@LocalServerPort
@@ -39,7 +46,8 @@ public class ITServoControll {
 	}
 
 	TestRestTemplate restTemplate = new TestRestTemplate();
-
+	@Autowired
+	private ItemRepository itemRepository;
 	HttpHeaders headers = new HttpHeaders();
 
 	/*
@@ -48,7 +56,19 @@ public class ITServoControll {
 	 * for check that whole service is working properly 
 	 * ==================================================
 	 */
-
+	@Before
+	public void addDummyObj () {
+		
+		Item a = new Item( "A", 40, 70, 3);
+		Item b = new Item( "B", 10, 15, 2);
+		Item c = new Item( "C", 30, 60, 4);
+		Item d = new Item( "D", 25, 40, 2);
+		itemRepository.save(a);
+		itemRepository.save(b);
+		itemRepository.save(c);
+		itemRepository.save(d);
+		
+	}
 	
 	/*
 	 * Test of showCart method, ServoControll.class

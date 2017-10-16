@@ -21,7 +21,7 @@ import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
 
 @Service("itemService")
 @Transactional
-public class ItemServiceImplementation implements ItemService {
+public class ItemServiceImplementation implements ItemCRUDService, ItemCostService, ItemFindService {
 
 	/*
 	 * =======================================================================
@@ -32,17 +32,10 @@ public class ItemServiceImplementation implements ItemService {
 
 	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
 
+	
 	@Autowired
-    public void setItemRepository(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
-	@Autowired
-    public void setBasketRepository(BasketRepository basketRepository) {
-        this.basketRepository = basketRepository;
-    }
-//	@Autowired
 	private BasketRepository basketRepository;
-//	@Autowired
+	@Autowired
 	private ItemRepository itemRepository;
 
 	/*
@@ -68,17 +61,17 @@ public class ItemServiceImplementation implements ItemService {
 	 */
 	public Iterable<Basket> addToBasket(String name, int qty) {
 		
-		if (!basketRepository.exists(findItem(name).getId())) { // findItem(name).getId()
+			if (basketRepository.exists(itemRepository.findOne(findItem(name).getId()).getId())==false) { // findItem(name).getId()
 																								// ?
 			logger.info("add to empty list");
 			basketRepository.save(new Basket(qty, itemCost(name, qty), findItem(name)));
 			logger.info("adding");
-		}
+		}else{
 
 		modifyOrder(findItem(name).getId(), qty);
 		itemCost(name, qty);
 		logger.info("modify");
-
+		}
 		return showBasket();
 
 	}
@@ -166,8 +159,9 @@ public class ItemServiceImplementation implements ItemService {
 		if (qty == 0) {
 			removeFromBasket(id);
 		}
-		basketRepository.findOne(id).setQuantity(qty);
-		itemCost(id, qty);
+		long idd = findItem(id).getId();
+		basketRepository.findOne(idd).setQuantity(qty);
+		basketRepository.findOne(idd).setCost(itemCost(id, qty));
 
 		return showBasket();
 
@@ -187,8 +181,11 @@ public class ItemServiceImplementation implements ItemService {
 		if (qty == 0) {
 			removeFromBasket(name);
 		}
-		basketRepository.findOne(findItem(name).getId()).setQuantity(qty);
-		itemCost(name, qty);
+		long id = findItem(name).getId();
+		logger.info("id?"+id);
+		basketRepository.findOne(id).setQuantity(qty);
+		logger.info("newQty"+basketRepository.findOne(id).getQuantity());
+		basketRepository.findOne(id).setCost(itemCost(name, qty));
 
 		return showBasket();
 
