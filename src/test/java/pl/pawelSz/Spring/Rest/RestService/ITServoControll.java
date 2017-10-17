@@ -53,7 +53,6 @@ public class ITServoControll {
 		return "http://localhost:" + port + uri;
 	}
 
-	
 	@Before
 	public void initDummyDB() {
 
@@ -69,7 +68,6 @@ public class ITServoControll {
 
 	}
 
-	
 	@Test
 	public void testCShowCart() {
 
@@ -84,7 +82,6 @@ public class ITServoControll {
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 	}
 
-	
 	@Test
 	public void testAAddItemToBasketA() {
 
@@ -94,11 +91,10 @@ public class ITServoControll {
 				HttpMethod.GET, entity, String.class);
 
 		String expected = "[{\"orderId\":1,\"quantity\":3,\"cost\":70,\"items\":{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3}}]";
-		
+
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 	}
 
-	
 	@Test
 	public void testBAddItemToBasketB() {
 
@@ -113,7 +109,6 @@ public class ITServoControll {
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 	}
 
-	
 	@Test
 	public void testHRemoveItemFromBasketA() {
 
@@ -128,26 +123,20 @@ public class ITServoControll {
 
 	}
 
-	/*
-	 * Test of removeItemFromBasket(int) method, ServoControll.class
-	 */
-	// @Test
-	// public void testIRemoveItemFromBasketB() {
-	//
-	// HttpEntity<String> entity = new HttpEntity<>(null, headers);
-	//
-	// ResponseEntity<String> response =
-	// restTemplate.exchange(createURLWithPort("/checkout/basket/remove/id/3/"),
-	// HttpMethod.DELETE, entity, String.class);
-	//
-	// String expected =
-	// "[{\"orderId\":1,\"quantity\":3,\"cost\":70,\"items\":{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3}}]";
-	//
-	// JSONAssert.assertEquals(expected, response.getBody(), false);
-	//
-	// }
+	@Test
+	public void testIRemoveItemFromBasketB() {
 
-	
+		HttpEntity<String> entity = new HttpEntity<>(null, headers);
+
+		ResponseEntity<String> response = restTemplate.exchange(createURLWithPort("/checkout/basket/remove/id/3/"),
+				HttpMethod.DELETE, entity, String.class);
+
+		String expected = "[{\"orderId\":1,\"quantity\":10,\"cost\":250,\"items\":{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3}}]";
+		
+		JSONAssert.assertEquals(expected, response.getBody(), false);
+
+	}
+
 	@Test
 	public void testDModifyItemFromBasketA() {
 
@@ -163,9 +152,7 @@ public class ITServoControll {
 
 	}
 
-	/*
-	 * Test of modifyQtyItemFromBasket(int) method, ServoControll.class
-	 */
+	
 	@Test
 	public void testEModifyItemFromBasketB() {
 
@@ -181,7 +168,6 @@ public class ITServoControll {
 
 	}
 
-	
 	@Test
 	public void testJRemoveAllItemsFromBasket() {
 
@@ -195,7 +181,6 @@ public class ITServoControll {
 
 	}
 
-	
 	@Test
 	public void testFTotalCost() {
 
@@ -209,7 +194,6 @@ public class ITServoControll {
 
 	}
 
-	
 	@Test
 	public void testGBasketSummary() {
 
