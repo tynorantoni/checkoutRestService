@@ -17,7 +17,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import pl.pawelSz.Spring.Rest.RestService.Model.BasketRepository;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
 import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
-import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
+import pl.pawelSz.Spring.Rest.RestService.Service.CostServiceImplementation;
+import pl.pawelSz.Spring.Rest.RestService.Service.FindServiceImplementation;
+import pl.pawelSz.Spring.Rest.RestService.Service.CRUDServiceImplementation;
 
 /**
  * @author Paweł Szymaszek
@@ -30,15 +32,18 @@ import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
 @SpringBootTest
 public class ItemServiceImplTest {
 
-
 	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplTest.class);
 
 	@Autowired
-	private ItemServiceImplementation itemServImpl;
+	private CRUDServiceImplementation crudServImpl;
 	@Autowired
 	private ItemRepository itemRepository;
 	@Autowired
 	private BasketRepository basketRepository;
+	@Autowired
+	private CostServiceImplementation costServImpl;
+	@Autowired
+	private FindServiceImplementation findServImpl;
 
 	@Before
 	public void dummyDbInit() {
@@ -55,110 +60,98 @@ public class ItemServiceImplTest {
 
 	@After
 	public void dbClear() {
-		itemServImpl.removeAllFromBasket();
+		crudServImpl.removeAllFromBasket();
 	}
 
-	
 	@Test
 	public void testShowBasket() {
-		assertEquals(basketRepository.findAll(), itemServImpl.showBasket());
+		assertEquals(basketRepository.findAll(), crudServImpl.showBasket());
 	}
 
-	
 	@Test
 	public void testAddToBasketStringLong() {
 
-		itemServImpl.addToBasket("A", 3);
+		crudServImpl.addToBasket("A", 3);
 
 		assertNotNull(basketRepository);
-		assertEquals("A", itemServImpl.showBasket().iterator().next().getItems().getName());
+		assertEquals("A", crudServImpl.showBasket().iterator().next().getItems().getName());
 
 	}
 
-	
 	@Test
 	public void testAddToBasketLongint() {
-		itemServImpl.addToBasket(2, 1);
+		crudServImpl.addToBasket(2, 1);
 
 		assertNotNull(basketRepository);
-		assertEquals(2, itemServImpl.showBasket().iterator().next().getOrderId());
+		assertEquals(2, crudServImpl.showBasket().iterator().next().getOrderId());
 	}
 
-	
 	@Test
 	public void testRemoveFromBasketString() {
-		itemServImpl.addToBasket("A", 3);
-		itemServImpl.addToBasket(2, 1);
-		itemServImpl.removeFromBasket("B");
+		crudServImpl.addToBasket("A", 3);
+		crudServImpl.addToBasket(2, 1);
+		crudServImpl.removeFromBasket("B");
 		assertEquals(1, basketRepository.count());
 	}
 
-	
 	@Test
 	public void testRemoveFromBasketLong() {
-		itemServImpl.addToBasket("A", 3);
-		itemServImpl.addToBasket(2, 1);
+		crudServImpl.addToBasket("A", 3);
+		crudServImpl.addToBasket(2, 1);
 
-		itemServImpl.removeFromBasket(1);
+		crudServImpl.removeFromBasket(1);
 		assertEquals(1, basketRepository.count());
 	}
 
-	
 	@Test
 	public void testModifyOrderStringInt() {
-		itemServImpl.addToBasket("D", 1);
-		itemServImpl.modifyOrder("D", 100);
-		assertEquals(100, itemServImpl.showBasket().iterator().next().getQuantity());
+		crudServImpl.addToBasket("D", 1);
+		crudServImpl.modifyOrder("D", 100);
+		assertEquals(100, crudServImpl.showBasket().iterator().next().getQuantity());
 	}
 
-	
 	@Test
 	public void testModifyOrderIntInt() {
-		itemServImpl.addToBasket(4, 1);
-		itemServImpl.modifyOrder(4, 200);
+		crudServImpl.addToBasket(4, 1);
+		crudServImpl.modifyOrder(4, 200);
 
-		assertEquals(200, itemServImpl.showBasket().iterator().next().getQuantity());
+		assertEquals(200, crudServImpl.showBasket().iterator().next().getQuantity());
 	}
 
-	
 	@Test
 	public void testFindItemString() {
-		assertEquals("A", itemServImpl.findItem("A").getName());
+		assertEquals("A", findServImpl.findItem("A").getName());
 	}
 
-	
 	@Test
 	public void testFindItemInt() {
-		assertEquals("A", itemServImpl.findItem(1).getName());
+		assertEquals("A", findServImpl.findItem(1).getName());
 	}
 
-	
 	@Test
 	public void testItemCostString() {
-		itemServImpl.addToBasket("A", 1);
+		crudServImpl.addToBasket("A", 1);
 		assertEquals(40, basketRepository.findAll().iterator().next().getCost());
 	}
 
-	
 	@Test
 	public void testItemCostInt() {
-		itemServImpl.addToBasket(1, 1);
+		crudServImpl.addToBasket(1, 1);
 		assertEquals(40, basketRepository.findAll().iterator().next().getCost());
 	}
 
 	@Test
 	public void testTotalCost() {
-		itemServImpl.addToBasket(1, 1);
-		itemServImpl.addToBasket(2, 1);
-		
-		assertEquals(50, itemServImpl.totalCost());
+		crudServImpl.addToBasket(1, 1);
+		crudServImpl.addToBasket(2, 1);
+
+		assertEquals(50, costServImpl.totalCost());
 	}
 
-	
 	@Test
 	public void testRemoveAllFromBasket() {
-		itemServImpl.addToBasket(4, 1);
-		itemServImpl.removeAllFromBasket();
+		crudServImpl.addToBasket(4, 1);
+		crudServImpl.removeAllFromBasket();
 		assertEquals(0, basketRepository.count());
 
 	}

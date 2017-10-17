@@ -132,7 +132,7 @@ public class ITServoControll {
 				HttpMethod.DELETE, entity, String.class);
 
 		String expected = "[{\"orderId\":1,\"quantity\":10,\"cost\":250,\"items\":{\"id\":1,\"name\":\"A\",\"price\":40,\"specialPrice\":70,\"qtyToDiscount\":3}}]";
-		
+
 		JSONAssert.assertEquals(expected, response.getBody(), false);
 
 	}
@@ -152,7 +152,6 @@ public class ITServoControll {
 
 	}
 
-	
 	@Test
 	public void testEModifyItemFromBasketB() {
 

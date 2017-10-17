@@ -8,8 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import pl.pawelSz.Spring.Rest.RestService.Model.Basket;
 import pl.pawelSz.Spring.Rest.RestService.Model.BasketRepository;
-import pl.pawelSz.Spring.Rest.RestService.Model.Item;
-import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
 
 /**
  * @author Paweł Szymaszek
@@ -17,16 +15,18 @@ import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
  * @since 17.10.2017
  */
 
-@Service("itemService")
+@Service("crudService")
 @Transactional
-public class ItemServiceImplementation implements ItemCRUDService, ItemCostService, ItemFindService {
+public class CRUDServiceImplementation implements ItemCRUDService {
 
-	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplementation.class);
+	public static final Logger logger = LoggerFactory.getLogger(CRUDServiceImplementation.class);
 
 	@Autowired
 	private BasketRepository basketRepository;
 	@Autowired
-	private ItemRepository itemRepository;
+	private CostServiceImplementation costServImpl;
+	@Autowired
+	private FindServiceImplementation findServImpl;
 
 	public Iterable<Basket> showBasket() {
 
@@ -42,14 +42,14 @@ public class ItemServiceImplementation implements ItemCRUDService, ItemCostServi
 			}
 		}
 		if (basketRepository.exists(idOfObject)) {
-			qty+=basketRepository.findOne(idOfObject).getQuantity();
-			modifyOrder(findItem(name).getId(), qty );
+			qty += basketRepository.findOne(idOfObject).getQuantity();
+			modifyOrder(findServImpl.findItem(name).getId(), qty);
 			logger.info("modify z elza");
 
-		}else{
-		logger.info("add to empty list");
-		basketRepository.save(new Basket(qty, itemCost(name, qty), findItem(name)));
-		logger.info("adding");
+		} else {
+			logger.info("add to empty list");
+			basketRepository.save(new Basket(qty, costServImpl.itemCost(name, qty), findServImpl.findItem(name)));
+			logger.info("adding");
 		}
 		return showBasket();
 
@@ -64,14 +64,14 @@ public class ItemServiceImplementation implements ItemCRUDService, ItemCostServi
 			}
 		}
 		if (basketRepository.exists(idOfObject)) {
-			qty+=basketRepository.findOne(idOfObject).getQuantity();
-			modifyOrder(findItem(id).getId(), qty );
+			qty += basketRepository.findOne(idOfObject).getQuantity();
+			modifyOrder(findServImpl.findItem(id).getId(), qty);
 			logger.info("modify z elza");
 
-		}else{
-		logger.info("add to empty list");
-		basketRepository.save(new Basket(qty, itemCost(id, qty), findItem(id)));
-		logger.info("adding");
+		} else {
+			logger.info("add to empty list");
+			basketRepository.save(new Basket(qty, costServImpl.itemCost(id, qty), findServImpl.findItem(id)));
+			logger.info("adding");
 		}
 		return showBasket();
 
@@ -128,9 +128,9 @@ public class ItemServiceImplementation implements ItemCRUDService, ItemCostServi
 		if (qty == 0) {
 			removeFromBasket(id);
 		}
-		
+
 		basketRepository.findOne(idOfObjectToModify).setQuantity(qty);
-		basketRepository.findOne(idOfObjectToModify).setCost(itemCost(id, qty));
+		basketRepository.findOne(idOfObjectToModify).setCost(costServImpl.itemCost(id, qty));
 
 		return showBasket();
 	}
@@ -151,56 +151,9 @@ public class ItemServiceImplementation implements ItemCRUDService, ItemCostServi
 		}
 
 		basketRepository.findOne(idOfObjectToModify).setQuantity(qty);
-		basketRepository.findOne(idOfObjectToModify).setCost(itemCost(name, qty));
+		basketRepository.findOne(idOfObjectToModify).setCost(costServImpl.itemCost(name, qty));
 
 		return showBasket();
-	}
-
-	public Item findItem(String name) {
-
-		for (Item item : itemRepository.findAll()) {
-			if (item.getName().equals(name)) {
-				return item;
-			}
-		}
-		return null;
-	}
-
-	public Item findItem(long id) {
-		if (itemRepository.exists(id)) {
-			return itemRepository.findOne(id);
-		}
-		return null;
-	}
-
-	public int itemCost(String name, int qty) {
-
-		int price = 0;
-		int modulo = qty % findItem(name).getQtyToDiscount();
-
-		price = findItem(name).getPrice() * modulo
-				+ findItem(name).getSpecialPrice() * ((qty - modulo) / findItem(name).getQtyToDiscount());
-		
-		return price;
-
-	}
-
-	public int itemCost(long id, int qty) {
-
-		int price = 0;
-		int modulo = qty % findItem(id).getQtyToDiscount();
-
-		price = findItem(id).getPrice() * modulo
-				+ findItem(id).getSpecialPrice() * ((qty - modulo) / findItem(id).getQtyToDiscount());
-		return price;
-	}
-
-	public int totalCost() {
-		int total = 0;
-		for (Basket basket : basketRepository.findAll()) {
-			total += basket.getCost();
-		}
-		return total;
 	}
 
 	public void removeAllFromBasket() {
