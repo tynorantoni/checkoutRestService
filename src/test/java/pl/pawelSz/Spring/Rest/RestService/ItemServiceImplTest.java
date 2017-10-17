@@ -1,349 +1,165 @@
 package pl.pawelSz.Spring.Rest.RestService;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import pl.pawelSz.Spring.Rest.RestService.Model.BasketRepository;
 import pl.pawelSz.Spring.Rest.RestService.Model.Item;
+import pl.pawelSz.Spring.Rest.RestService.Model.ItemRepository;
 import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
 
 /**
- *
  * @author Paweł Szymaszek
- * @version 1.0
- * @since 21.09.2017
- *
+ * @version 1.1
+ * @since 17.10.2017
  */
 
+@RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:application.properties")
+@SpringBootTest
 public class ItemServiceImplTest {
 
-	/*
-	 * ======================================== 
-	 * Unit test of service class
-	 * ========================================
-	 */
 
-	public static ItemServiceImplementation itemServTest = new ItemServiceImplementation();
-	// List of dummy objects
-	public static List<Item> testItems;
-	// cart - list where will be added/modified/removed Items from testItems
-	// storage
-	public static List<Item> cart = new ArrayList<>();
+	public static final Logger logger = LoggerFactory.getLogger(ItemServiceImplTest.class);
 
-	
-	
-	
-	/*====================================================
-	 *Methods copied from ItemServiceImplementation class
-	 */
-	public Item findItem(String name) {
-		for (Item item : testItems) {
-			if (item.getName().equals(name)) {
-				return item;
-			}
-		}
-		return null;
-	}
+	@Autowired
+	private ItemServiceImplementation itemServImpl;
+	@Autowired
+	private ItemRepository itemRepository;
+	@Autowired
+	private BasketRepository basketRepository;
 
-	public Item findItem(int id) {
-		for (Item item : testItems) {
-			if (item.getId() == id) {
-				return item;
-			}
-		}
-		return null;
-	}
-	/*
-	 * ====================================================
-	 */
-	
-	
-	
-	
-	
-	
-	/*
-	 * Initialize list of item objects before testing
-	 * 
-	 */
-	@BeforeClass
-	public static void initializeClass() {
-
-		testItems = new ArrayList<>();
-		testItems.add(new Item(1, "A", 40, 70, 3, 0, 0));
-		testItems.add(new Item(2, "B", 10, 15, 2, 0, 0));
-		testItems.add(new Item(3, "C", 30, 60, 4, 0, 0));
-		testItems.add(new Item(4, "D", 25, 40, 2, 0, 0));
-
-	}
-
-	/*
-	 * Clears cart list before each test
-	 */
 	@Before
-	public void initialize() {
-		cart.clear();
+	public void dummyDbInit() {
+		Item a = new Item("A", 40, 70, 3);
+		Item b = new Item("B", 10, 15, 2);
+		Item c = new Item("C", 30, 60, 4);
+		Item d = new Item("D", 25, 40, 2);
+		itemRepository.save(a);
+		itemRepository.save(b);
+		itemRepository.save(c);
+		itemRepository.save(d);
+
 	}
 
-	/*
-	 * Test of showBasket method, ItemServiceImplementation.class
-	 */
+	@After
+	public void dbClear() {
+		itemServImpl.removeAllFromBasket();
+	}
+
+	
 	@Test
 	public void testShowBasket() {
-
-		assertTrue("Should be empty", cart.isEmpty());
+		assertEquals(basketRepository.findAll(), itemServImpl.showBasket());
 	}
 
-	/*
-	 * Test of addToBasket (specified by name) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
-	public void testAddToBasketStringInt() {
-		String name = "A";
-		int qty = 5;
-		cart.add(findItem(name));
-		cart.get(cart.size() - 1).setQuantity(qty);
-		
-		assertEquals(testItems.get(0), cart.get(0));
+	public void testAddToBasketStringLong() {
+
+		itemServImpl.addToBasket("A", 3);
+
+		assertNotNull(basketRepository);
+		assertEquals("A", itemServImpl.showBasket().iterator().next().getItems().getName());
 
 	}
 
-	/*
-	 * Test of addToBasket (specified by id) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
-	public void testAddToBasketIntInt() {
-		int id = 2;
-		int qty = 6;
-		cart.add(findItem(id));
-		cart.get(cart.size() - 1).setQuantity(qty);
+	public void testAddToBasketLongint() {
+		itemServImpl.addToBasket(2, 1);
 
-		assertEquals(testItems.get(1), cart.get(0));
+		assertNotNull(basketRepository);
+		assertEquals(2, itemServImpl.showBasket().iterator().next().getOrderId());
 	}
 
-	/*
-	 * Test of removeFromBasket (specified by name) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testRemoveFromBasketString() {
-		assertTrue(cart.isEmpty());
-		String name = "C";
-		int qty = 6;
-		cart.add(findItem(name));
-		cart.get(cart.size() - 1).setQuantity(qty);
-
-		assertEquals(testItems.get(2), cart.get(0));
-
-		for (int i = 0; i < cart.size(); i++) {
-
-			if (cart.get(i).getName().equals(name)) {
-				cart.remove(i);
-				assertTrue(cart.isEmpty());
-			}
-		}
-
+		itemServImpl.addToBasket("A", 3);
+		itemServImpl.addToBasket(2, 1);
+		itemServImpl.removeFromBasket("B");
+		assertEquals(1, basketRepository.count());
 	}
 
-	/*
-	 * Test of removeFromBasket (specified by id) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
-	public void testRemoveFromBasketInt() {
-		assertTrue(cart.isEmpty());
-		int id = 3;
-		int qty = 6;
-		cart.add(findItem(id));
-		cart.get(cart.size() - 1).setQuantity(qty);
+	public void testRemoveFromBasketLong() {
+		itemServImpl.addToBasket("A", 3);
+		itemServImpl.addToBasket(2, 1);
 
-		assertEquals(testItems.get(2), cart.get(0));
-
-		for (int i = 0; i < cart.size(); i++) {
-
-			if (cart.get(i).getId() == (id)) {
-				cart.remove(i);
-				assertTrue(cart.isEmpty());
-			}
-		}
-
+		itemServImpl.removeFromBasket(1);
+		assertEquals(1, basketRepository.count());
 	}
 
-	/*
-	 * Test of modifyOrder (specified by name) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testModifyOrderStringInt() {
-		String name = "D";
-		int qty = 8;
-		int qty2 = 80;
-
-		cart.add(findItem(name));
-		cart.get(cart.size() - 1).setQuantity(qty);
-
-		assertEquals(testItems.get(3), cart.get(0));
-		for (Item item : cart) {
-			if (item.getName().equals(name)) {
-				item.setQuantity(qty2);
-				assertEquals(testItems.get(3), cart.get(0));
-			}
-
-		}
-
+		itemServImpl.addToBasket("D", 1);
+		itemServImpl.modifyOrder("D", 100);
+		assertEquals(100, itemServImpl.showBasket().iterator().next().getQuantity());
 	}
 
-	/*
-	 * Test of modifyOrder (specified by id) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testModifyOrderIntInt() {
-		int id = 4;
-		int qty = 8;
-		int qty2 = 80;
+		itemServImpl.addToBasket(4, 1);
+		itemServImpl.modifyOrder(4, 200);
 
-		cart.add(findItem(id));
-		cart.get(cart.size() - 1).setQuantity(qty);
-
-		assertEquals(testItems.get(3), cart.get(0));
-		for (Item item : cart) {
-			if (item.getId() == (id)) {
-				item.setQuantity(qty2);
-				assertEquals(testItems.get(3), cart.get(0));
-			}
-
-		}
+		assertEquals(200, itemServImpl.showBasket().iterator().next().getQuantity());
 	}
 
-	/*
-	 * Test of findItem (specified by name) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testFindItemString() {
-		String name = "A";
-		for (Item item : testItems) {
-			if (item.getName().equals(name)) {
-				assertEquals(testItems.get(0), item);
-			}
-		}
+		assertEquals("A", itemServImpl.findItem("A").getName());
 	}
 
-	/*
-	 * Test of findItem (specified by id) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testFindItemInt() {
-		int id = 1;
-		for (Item item : testItems) {
-			if (item.getId() == id) {
-				assertEquals(testItems.get(0), item);
-			}
-		}
+		assertEquals("A", itemServImpl.findItem(1).getName());
 	}
 
-	/*
-	 * Test of itemCost (specified by name) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testItemCostString() {
-		String name = "D";
-		int qty = 8;
-		cart.add(findItem(name));
-		cart.get(cart.size() - 1).setQuantity(qty);
-
-		int price = 0;
-		for (Item item : cart) {
-			if (item.getName().equals(name)) {
-				if (item.getQuantity() % item.getQtyToDiscount() == 0) {
-					price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount());
-					item.setCost(price);
-				} else {
-					price = item.getQuantity() * item.getPrice();
-					item.setCost(price);
-				}
-			}
-		}
-		assertEquals(testItems.get(3).getSpecialPrice()
-				* (testItems.get(3).getQuantity() / testItems.get(3).getQtyToDiscount()), price);
+		itemServImpl.addToBasket("A", 1);
+		assertEquals(40, basketRepository.findAll().iterator().next().getCost());
 	}
 
-	/*
-	 * Test of itemCost (specified by id) method,
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testItemCostInt() {
-		int id = 4;
-		int qty = 7;
-		cart.add(findItem(id));
-		cart.get(cart.size() - 1).setQuantity(qty);
-
-		int price = 0;
-		for (Item item : cart) {
-			if (item.getId() == id) {
-				if (item.getQuantity() % item.getQtyToDiscount() == 0) {
-					price = item.getSpecialPrice() * (item.getQuantity() / item.getQtyToDiscount());
-					item.setCost(price);
-				} else {
-					price = item.getQuantity() * item.getPrice();
-					item.setCost(price);
-				}
-			}
-		}
-		assertEquals(testItems.get(3).getQuantity() * testItems.get(3).getPrice(), price);
+		itemServImpl.addToBasket(1, 1);
+		assertEquals(40, basketRepository.findAll().iterator().next().getCost());
 	}
 
-	/*
-	 * Test of totalCost method, ItemServiceImplementation.class
-	 */
 	@Test
 	public void testTotalCost() {
-		String name = "D";
-		int qtyName = 3;
-		int id = 3;
-		int qtyId = 7;
-		int total = 0;
-
-		cart.add(findItem(id));
-		cart.get(cart.size() - 1).setQuantity(qtyId);
-		cart.add(findItem(name));
-		cart.get(cart.size() - 1).setQuantity(qtyName);
-		assertEquals(testItems.get(3), cart.get(1));
-		assertEquals(testItems.get(2), cart.get(0));
-		cart.get(0).setCost(qtyId * cart.get(0).getPrice());
-		cart.get(1).setCost(qtyName * cart.get(1).getPrice());
-		for (Item item : cart) {
-			total += item.getCost();
-		}
-		assertEquals(cart.get(0).getCost() + cart.get(1).getCost(), total);
+		itemServImpl.addToBasket(1, 1);
+		itemServImpl.addToBasket(2, 1);
+		
+		assertEquals(50, itemServImpl.totalCost());
 	}
 
-	/*
-	 * Test of removeAllfromBasket method, 
-	 * ItemServiceImplementation.class
-	 */
+	
 	@Test
 	public void testRemoveAllFromBasket() {
-		String name = "D";
-		int qty = 8;
-
-		cart.add(findItem(name));
-		cart.get(cart.size() - 1).setQuantity(qty);
-		assertEquals(testItems.get(3), cart.get(0));
-		cart.clear();
-		assertTrue(cart.isEmpty());
+		itemServImpl.addToBasket(4, 1);
+		itemServImpl.removeAllFromBasket();
+		assertEquals(0, basketRepository.count());
 
 	}
 

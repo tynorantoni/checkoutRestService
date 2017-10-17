@@ -11,7 +11,11 @@ showBasket()
 	URL Params Required: none
 
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 
+	
+	
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]	
 ========================================================
 
 addItemToBasket()
@@ -25,7 +29,10 @@ addItemToBasket()
 	URL Params Required: name=[String], qty=[integer]
 
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 
+
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]
 
 	Error Response:
 	Code: 404 NOT FOUND 
@@ -40,10 +47,13 @@ addItemToBasket()
 
 	Method: GET
 
-	URL Params Required: id=[integer], qty=[integer]
+	URL Params Required: id=[long], qty=[integer]
 
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 	
+	
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]
 
 	Error Response:
 	Code: 404 NOT FOUND 
@@ -61,7 +71,10 @@ removeItemFromBasket()
 	URL Params Required: name=[String]
 	
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 
+	
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]
 	or: []
 	
 	Error Response:
@@ -77,10 +90,13 @@ removeItemFromBasket()
 	
 	Method: DELETE
 	
-	URL Params Required: id=[integer]
+	URL Params Required: id=[long]
 	
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 
+	
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]
 	or: []
 	
 	Error Response:
@@ -98,7 +114,10 @@ modifyQtyItemFromBasket()
 	URL Params Required: name=[String], qty=[integer]
 	
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 	
+	
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]
 	or: []
 	
 	Error Response:
@@ -113,10 +132,13 @@ modifyQtyItemFromBasket()
 	URL /checkout/basket/change/id/{id}/{qty}
 	Method: PUT
 	
-	URL Params Required: id=[integer], qty=[integer]
+	URL Params Required: id=[long], qty=[integer]
 	
 	Success Response: Code: 200 
-	Sample Content: [{"id":1,"name":"A","price":40,"specialPrice":70,"qtyToDiscount":3,"quantity":3,"cost":70}]
+	Sample Content: 	
+	
+	[{"orderId":1,"quantity":3,"cost":70,"items":{"id":1,"name":"A","price":40,"specialPrice":70,
+	"qtyToDiscount":3}}]
 	or: []
 	
 	Error Response:
@@ -134,7 +156,9 @@ removeAllItemsFromBasket()
 	URL Params Required: none
 	
 	Success Response: Code: 200 
-	Sample Content: []
+	Sample Content: 
+	
+	[]
 ========================================================
 
 totalCostFromBasket()
@@ -147,7 +171,9 @@ totalCostFromBasket()
 	URL Params Required: none
 	
 	Success Response: Code: 200 
-	Sample Content: {515}
+	Sample Content: 
+	
+	{515}
 ========================================================
 
 totalCostFromBasket()
@@ -160,9 +186,11 @@ totalCostFromBasket()
 	URL Params Required: none
 	
 	Success Response: Code: 200 
-	Sample Content: Item name: A Price: 40 quantity: 10 Cost: 400
-					   Item name: B Price: 10 quantity: 15 Cost: 150
-	                Total Cost: 550
+	Sample Content: 
+	
+	Item name: A Price: 40 quantity: 10 Cost: 250
+	Item name: B Price: 10 quantity: 15 Cost: 115
+	Total Cost: 365
 ========================================================					
 		
 
