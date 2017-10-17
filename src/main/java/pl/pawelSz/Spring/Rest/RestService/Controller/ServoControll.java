@@ -20,11 +20,9 @@ import pl.pawelSz.Spring.Rest.RestService.Service.ItemServiceImplementation;
 import pl.pawelSz.Spring.Rest.RestService.Util.MyError;
 
 /**
- *
  * @author Paweł Szymaszek
- * @version 1.0
- * @since 21.09.2017
- *
+ * @version 1.1
+ * @since 17.10.2017
  */
 
 @Controller

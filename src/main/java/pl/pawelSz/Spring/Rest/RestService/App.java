@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
 *
 * @author Paweł Szymaszek
-* @version 1.0
-* @since 21.09.2017
+* @version 1.1
+* @since 17.10.2017
 *
 */ 
 

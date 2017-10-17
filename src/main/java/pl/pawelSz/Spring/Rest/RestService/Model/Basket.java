@@ -1,5 +1,11 @@
 package pl.pawelSz.Spring.Rest.RestService.Model;
 
+/**
+* @author Paweł Szymaszek
+* @version 1.1
+* @since 17.10.2017
+*/
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,18 +22,17 @@ public class Basket {
 	private long orderId;
 	private int quantity;
 	private int cost;
-	
-	
-	//@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
+
 	@OneToOne
-	@JoinTable(name = "BASKET_ORDERS", joinColumns = { @JoinColumn(name = "ORDER_ID") }, inverseJoinColumns = { @JoinColumn(name = "ID") })
+	@JoinTable(name = "BASKET_ORDERS", joinColumns = { @JoinColumn(name = "ORDER_ID") }, inverseJoinColumns = {
+			@JoinColumn(name = "ID") })
 	private Item item;
 
 	public Basket() {
 	}
 
-	public Basket(int quantity, int cost,Item items) {
-		
+	public Basket(int quantity, int cost, Item items) {
+
 		this.quantity = quantity;
 		this.cost = cost;
 		this.item = items;
@@ -65,6 +70,4 @@ public class Basket {
 		this.item = items;
 	}
 
-	
-	
 }
